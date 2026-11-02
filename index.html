@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CKC trainingen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#E9EEEA; --surface:#FFFFFF; --ink:#16241C; --muted:#4E5F55; --line:#C9D3CC;
+  --team:#1E5BD8; --accent:#1E5BD8; --chip:#DCE5DF;
+  color-scheme: light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E1813; --surface:#16231C; --ink:#E4ECE6; --muted:#9DB0A4; --line:#2A3B31;
+    --team:#5B8CFF; --accent:#7EA6FF; --chip:#22342A;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E1813; --surface:#16231C; --ink:#E4ECE6; --muted:#9DB0A4; --line:#2A3B31;
+  --team:#5B8CFF; --accent:#7EA6FF; --chip:#22342A;
+  color-scheme: dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  font-size:17px;line-height:1.5}
+.wrap{max-width:860px;margin:0 auto;padding:24px 18px 56px}
+h1{font-family:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;font-weight:700;
+  font-size:clamp(38px,8vw,60px);line-height:1;margin:0 0 8px}
+.intro{margin:0 0 22px;color:var(--muted);max-width:60ch}
+.teams{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 6px}
+.teams button{font:inherit;font-size:16px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);
+  border-radius:999px;padding:8px 16px;cursor:pointer;min-height:42px}
+.teams button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.teams button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+h2{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:26px;margin:26px 0 10px}
+.list{display:grid;gap:12px}
+a.training{display:grid;grid-template-columns:64px 1fr;gap:16px;align-items:start;text-decoration:none;color:inherit;
+  background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:16px}
+a.training:hover{border-color:var(--ink)}
+a.training:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.nr{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:48px;line-height:.9;
+  color:var(--team);text-align:center;padding-top:4px}
+.training h3{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:28px;line-height:1.05;margin:0 0 4px}
+.training .thema{margin:0 0 8px;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:0;padding:0;list-style:none}
+.chips li{background:var(--chip);border-radius:999px;padding:3px 10px;font-size:14px}
+.how{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-top:36px}
+.how h2{margin-top:0}
+.how ul{margin:0;padding-left:20px}
+.how li{margin:0 0 8px}
+.empty{color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>CKC trainingen</h1>
+    <p class="intro">Per training: een animatie van elke oefening, wat je neerzet en waar je op coacht. Gemaakt om op je telefoon langs het veld te gebruiken.</p>
+    <div class="teams" id="teams" role="group" aria-label="Kies je leeftijdscategorie"></div>
+  </header>
+
+  <main id="main"></main>
+
+  <section class="how">
+    <h2>Zo gebruik je dit op het veld</h2>
+    <ul>
+      <li>Zet deze pagina op het beginscherm van je telefoon. Dan heb je alle trainingen met één tik bij de hand.</li>
+      <li>Kijk de training thuis een keer door. Op het veld is het een spiekbriefje, geen handleiding.</li>
+      <li>Met <strong>Volledig scherm</strong> kun je een oefening aan de kinderen laten zien. Tik op het veld om te pauzeren.</li>
+    </ul>
+  </section>
+</div>
+
+<script>
+/*
+  NIEUWE TRAINING TOEVOEGEN
+  1. Upload het trainingsbestand in dezelfde map als deze index.html.
+     Vaste naamopbouw: CKC_<leeftijd>_Training-<nr>_<Onderwerp>.html
+     Let op: hoofdletters tellen mee, en de O is een letter, geen nul.
+  2. Kopieer hieronder een blok { ... } en pas de gegevens aan.
+     - leeftijd:    bepaalt onder welke knop de training staat (bijv. "O9-O10", "O11-O12").
+     - teamfunctie: "Aanvallen", "Verdedigen" of "Omschakelen".
+     - link:        exact dezelfde bestandsnaam als op GitHub.
+  Een nieuwe leeftijdscategorie verschijnt vanzelf als knop zodra er een training voor is.
+*/
+var TRAININGEN = [
+  {
+    leeftijd: "O9-O10",
+    nr: 1,
+    titel: "Vrijlopen",
+    teamfunctie: "Aanvallen",
+    thema: "Positiespel in de opbouw. Begin van het seizoen.",
+    onderdelen: ["Warming-up", "2 tegen 1", "2 tegen 1 vrij", "Partijspel 3 tegen 3"],
+    link: "CKC_O9-O10_Training-1_Vrijlopen.html"
+  }
+];
+
+(function(){
+  var FUNCTIES = ["Aanvallen", "Verdedigen", "Omschakelen"];
+  var main = document.getElementById("main"), teamsEl = document.getElementById("teams");
+  function esc(t){var d=document.createElement("div");d.textContent=String(t);return d.innerHTML}
+  function num(s){var m=String(s).match(/\d+/);return m?parseInt(m[0],10):0}
+
+  var leeftijden = [];
+  TRAININGEN.forEach(function(t){if(leeftijden.indexOf(t.leeftijd)<0)leeftijden.push(t.leeftijd)});
+  leeftijden.sort(function(a,b){return num(a)-num(b)});
+
+  if(!leeftijden.length){main.innerHTML='<p class="empty">Er staan nog geen trainingen klaar.</p>';return}
+
+  // Gekozen categorie: uit de link (#O9-O10), anders laatst gekozen, anders de eerste
+  var gekozen = decodeURIComponent((location.hash||"").slice(1));
+  if(leeftijden.indexOf(gekozen)<0){
+    try{gekozen = localStorage.getItem("ckc-leeftijd")}catch(e){gekozen=null}
+  }
+  if(leeftijden.indexOf(gekozen)<0) gekozen = leeftijden[0];
+
+  // Knoppen alleen tonen als er meer dan één categorie is
+  if(leeftijden.length>1){
+    leeftijden.forEach(function(l){
+      var b=document.createElement("button"); b.type="button"; b.textContent=l;
+      b.addEventListener("click",function(){kies(l)}); teamsEl.appendChild(b);
+    });
+  } else teamsEl.hidden = true;
+
+  function kies(l){
+    gekozen = l;
+    try{localStorage.setItem("ckc-leeftijd",l)}catch(e){}
+    if(leeftijden.length>1 && location.hash.slice(1)!==l) history.replaceState(null,"","#"+l);
+    Array.prototype.forEach.call(teamsEl.children,function(b){b.setAttribute("aria-pressed",b.textContent===l?"true":"false")});
+    render();
+  }
+
+  function render(){
+    main.innerHTML = "";
+    var vanTeam = TRAININGEN.filter(function(t){return t.leeftijd===gekozen});
+    var titel = document.createElement("h2");
+    titel.textContent = "Trainingen " + gekozen;
+    titel.style.fontSize = "34px";
+    main.appendChild(titel);
+    FUNCTIES.forEach(function(f){
+      var lijst = vanTeam.filter(function(t){return t.teamfunctie===f}).sort(function(a,b){return a.nr-b.nr});
+      if(!lijst.length) return;
+      var sec = document.createElement("section");
+      sec.innerHTML = "<h2>"+esc(f)+"</h2>";
+      var box = document.createElement("div"); box.className = "list";
+      lijst.forEach(function(t){
+        var a = document.createElement("a"); a.className = "training"; a.href = t.link;
+        a.innerHTML = '<div class="nr" aria-hidden="true">'+esc(t.nr)+'</div><div><h3>Training '+esc(t.nr)+': '+esc(String(t.titel).toLowerCase())+'</h3>'+
+          '<p class="thema">'+esc(t.thema)+'</p><ul class="chips">'+
+          (t.onderdelen||[]).map(function(o){return "<li>"+esc(o)+"</li>"}).join("")+'</ul></div>';
+        box.appendChild(a);
+      });
+      sec.appendChild(box); main.appendChild(sec);
+    });
+  }
+
+  window.addEventListener("hashchange",function(){
+    var h=decodeURIComponent(location.hash.slice(1)); if(leeftijden.indexOf(h)>=0&&h!==gekozen)kies(h);
+  });
+  kies(gekozen);
+})();
+</script>
+</body>
+</html>
