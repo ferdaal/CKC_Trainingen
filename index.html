@@ -134,7 +134,7 @@ var TRAININGEN = [
   function kies(l){
     gekozen = l;
     try{localStorage.setItem("ckc-leeftijd",l)}catch(e){}
-    if(leeftijden.length>1 && location.hash.slice(1)!==l) history.replaceState(null,"","#"+l);
+    if(leeftijden.length>1 && location.hash.slice(1)!==l) {try{history.replaceState(null,"","#"+l)}catch(e){}}
     Array.prototype.forEach.call(teamsEl.children,function(b){b.setAttribute("aria-pressed",b.textContent===l?"true":"false")});
     render();
   }

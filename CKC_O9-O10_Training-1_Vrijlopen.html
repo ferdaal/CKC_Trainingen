@@ -89,12 +89,29 @@ svg#field{width:100%;height:auto;display:block;border-radius:8px;touch-action:ma
 .back{display:inline-block;color:var(--muted);text-decoration:none;font-size:15px;margin:0 0 10px;padding:6px 0}
 .back:hover{color:var(--ink)}
 .back:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:4px}
+.count{display:flex;align-items:center;gap:10px;margin-top:14px;flex-wrap:wrap}
+.count>span{color:var(--muted);font-size:15px}
+#kids{display:flex;gap:4px}
+#kids button{width:46px;height:44px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);
+  font:inherit;font-weight:700;font-size:18px;cursor:pointer}
+#kids button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+#kids button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.mat{width:100%;border-collapse:collapse;font-size:16px;margin:4px 0 10px}
+.mat th,.mat td{text-align:left;padding:7px 4px;border-bottom:1px solid var(--line);vertical-align:top}
+.mat th{font-size:14px;color:var(--muted);font-weight:700}
+.mat .num{text-align:right;font-variant-numeric:tabular-nums;width:76px}
+.mat td.num{font-weight:700}
+.mat small{display:block;color:var(--muted);font-size:14px}
+.note{color:var(--muted);font-size:15px}
+.cols3{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px}
 [hidden]{display:none!important}
 .stage.fs{position:fixed;inset:0;z-index:50;border-radius:0;border:0;display:flex;flex-direction:column;
   padding:calc(env(safe-area-inset-top,0px) + 8px) 8px calc(env(safe-area-inset-bottom,0px) + 8px);
   background:#0E1813;color:#E4ECE6}
-.stage.fs svg#field{flex:1 1 auto;min-height:0;height:100%;border-radius:6px}
+
 .stage.fs .legend{display:none}
+.stage.fs>*{flex:0 0 auto}
+.stage.fs>svg#field{flex:1 1 auto;min-height:0;height:100%;border-radius:6px}
 .stage.fs .caption{min-height:0}
 .stage.fs .caption .n{color:#9DB0A4}
 .stage.fs .caption .t{font-size:22px}
@@ -113,6 +130,7 @@ body.fsopen{overflow:hidden}
     <a class="back" href="./#O9-O10">&#8592; Alle trainingen</a>
     <h1>Training 1: vrijlopen</h1>
     <p>O9-O10. Begin van het seizoen. Eén leerdoel voor de hele training: als je de bal niet hebt, zorg je dat je aanspeelbaar bent.</p>
+    <div class="count" role="group" aria-label="Aantal kinderen"><span>Aantal kinderen</span><div id="kids"></div></div>
   </header>
 
   <nav role="tablist" id="tabs"></nav>
@@ -120,6 +138,16 @@ body.fsopen{overflow:hidden}
   <section id="ov" class="overview">
     <div class="timeline" id="timeline"></div>
     <div class="cols">
+      <div class="card">
+        <h2>Materiaal klaarzetten</h2>
+        <div id="matBox"></div>
+      </div>
+      <div class="card">
+        <h2 id="indTitle">Indeling</h2>
+        <div id="indBox"></div>
+      </div>
+    </div>
+    <div class="cols3">
       <div class="card">
         <h2>Het idee in één plaatje</h2>
         <p>Een verdediger werpt een “schaduw” vanaf de bal. Sta je in die schaduw, dan kan de pass niet bij je komen. Vrijlopen is: uit die schaduw stappen.</p>
@@ -131,10 +159,19 @@ body.fsopen{overflow:hidden}
         <h2>Voor je begint</h2>
         <ul>
           <li>Zet alles in één keer neer, vóór de kinderen er zijn. Daarna blijf je in die opstelling.</li>
-          <li>Materiaal: oranje hoedjes voor de vakken, gele hoedjes voor de verdedigerslijn, pionnen voor de poortjes, 1 bal per 2 spelers, hesjes, kleine doeltjes.</li>
-          <li>Werk in groepjes van 3 bij oefening B en C. Bij 9 spelers zijn dat 3 vakken naast elkaar, zodat niemand in de rij staat.</li>
+          <li>Gebruik dezelfde vakken voor A, B en C. De warming-up doe je in de onderste helft, tot aan de gele lijn.</li>
           <li>Doe elke oefening één keer zelf voor. Kort, met een kind erbij.</li>
           <li>Na afloop samen opruimen en vragen: “Wat heb je vandaag geleerd?”</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h2>Iemand afgemeld of te laat?</h2>
+        <ul>
+          <li>Bij B en C zijn groepjes van 3 de basis. Een vierde kind maakt er een groep van 4 van. Een groep van 2 maak je nooit.</li>
+          <li>Komt er een kind te laat? Het sluit aan bij een groep van 3. Je hoeft niets om te bouwen.</li>
+          <li>Minder kinderen dan verwacht? Laat een vak leeg liggen. Ombouwen kost meer tijd dan het oplevert.</li>
+          <li>Oneven aantal bij het partijspel? De extra speler wordt joker en speelt mee met de ploeg die de bal heeft.</li>
+          <li>Speel als trainer niet vast mee. Je bent nodig om te kijken en te coachen.</li>
         </ul>
       </div>
     </div>
@@ -176,7 +213,7 @@ var NS="http://www.w3.org/2000/svg";
 var DRILLS=[
 {
   id:"a", letter:"A", tab:"Warming-up", title:"Warming-up: dribbelen", time:"10 minuten",
-  w:10,h:5,m:3.6,shadow:false,size:0.55,
+  w:10,h:5,m:4.2,shadow:false,size:0.55,
   cones:[[0,0],[10,0],[0,5],[10,5]],
   gates:[[[5,1.8],[5,3.2]]],
   actors:{
@@ -194,7 +231,7 @@ var DRILLS=[
     {d:2.2,c:"Bouw op: rechts, links, om een pion heen, door het poortje. Doe het eerst zelf voor.",reset:false}
   ],
   goal:"Warm worden en veel balcontacten, met rechts én links.",
-  setup:"Vak van 10 × 5 meter met 4 hoedjes op de hoeken en 2 pionnen als poortje in het midden. 4 spelers en 1 bal per vak.",
+  setup:"De onderste helft van het vak van oefening B, tot aan de gele lijn (10 × 5 meter). 2 pionnen als poortje in het midden, 1 bal per vak.",
   coach:["Wissel rechts en links af.","Bal dicht bij de voet houden.","Doe elke variatie één keer zelf voor."],
   o10:"Moeilijker: hoger tempo, of alleen met de buitenkant van de voet."
 },
@@ -218,7 +255,7 @@ var DRILLS=[
     {d:2.8,c:"Daarna andersom: de aanvaller speelt vanuit het midden terug. Wissel na 3 à 4 beurten de verdediger."}
   ],
   goal:"De aanvaller leert uit de rug van de verdediger te lopen, zodat de bal bij hem kan komen.",
-  setup:"Vak van 10 × 10 meter. Gele hoedjes als lijn in het midden: de verdediger mag alleen over die lijn bewegen. 2 pionnen als poortje. 3 spelers per vak.",
+  setup:"Vak van 10 × 10 meter. Gele hoedjes als lijn in het midden: de verdediger mag alleen over die lijn bewegen. 2 pionnen als poortje. Dezelfde vakken als de warming-up.",
   coach:["Staat de aanvaller in de schaduw? Leg stil en vraag: “Kan de bal nu bij jou komen?”","De opbouwer speelt pas in als de aanvaller vrij staat.","Leg alleen stil als het doel niet lukt. Lukt het wel, laat ze doorspelen."],
   o10:"Moeilijker: de verdediger mag van de lijn af en de bal onderscheppen. Makkelijker: de verdediger blijft stilstaan."
 },
@@ -240,7 +277,7 @@ var DRILLS=[
     {d:2.4,c:"Zo blijft het rondgaan. Na een minuut of twee wisselt de verdediger."}
   ],
   goal:"Hetzelfde principe, nu zonder vaste looplijnen: zelf de vrije plek vinden.",
-  setup:"Vak van 10 × 10 meter met hoedjes. 3 spelers per vak, 1 bal.",
+  setup:"Hetzelfde vak als oefening B. De gele hoedjes en het poortje mogen blijven liggen. 1 bal per vak.",
   coach:["Na je pass meteen weer vrijlopen.","Met de bal: naar de vrije ruimte, niet naar de verdediger toe.","Spelletje: 5 passes achter elkaar is een punt."],
   o10:"Moeilijker: kleiner vak (8 × 8). Makkelijker: groter vak, of 3 tegen 1."
 },
@@ -262,10 +299,10 @@ var DRILLS=[
     {d:2.2,c:"Dribbelen naar de ruimte. De rest loopt mee.",mv:{b2:["none",[13.6,3.9]],ball:["dribble",[14.1,4.2]],b1:["run",[9,6.6]],o3:["run",[15.4,4.9]],o2:["run",[12.4,8.2]]}},
     {d:1.6,c:"Kijk wie vrij staat en speel hem aan.",mv:{b3:["run",[16,9.6]],ball:["pass",[15.8,9.1]],o2:["run",[12.8,8.7]]}},
     {d:1.2,c:"Afronden op het doeltje.",mv:{ball:["pass",[20.2,7]]}},
-    {d:3.0,c:"Na elk wedstrijdje draaien de teams met de klok mee naar het volgende veldje."}
+    {d:3.0,c:"Na een paar minuten: kort bij elkaar, eventueel de joker wisselen, en weer verder."}
   ],
   goal:"Alles samen in een echte wedstrijd: wie de bal niet heeft, loopt vrij.",
-  setup:"Veldje van ongeveer 20 × 13 meter, kleine doeltjes, hesjes. Met één team van 8 tot 10 spelers: één of twee veldjes, wissels draaien in.",
+  setup:"Eén veldje met kleine doeltjes. Eén ploeg draagt hesjes. Hoe groot het veld is, hangt af van het aantal kinderen.",
   coach:["Niet meer stilleggen. Coach kort tijdens het spel: “Kan hij bij jou?”","Let op hetzelfde als in B en C: staat de speler zonder bal vrij?","Na afloop bij elkaar: “Wat heb je vandaag geleerd?”"],
   o10:"Moeilijker: een doelpunt telt pas na minstens één pass. Of speel 4 tegen 4."
 }
@@ -442,6 +479,77 @@ function showFinal(){ // stap direct in eindstand tonen (bij handmatig stappen)
   drawTrails(1); stepT=D.steps[stepIdx].d; render();
 }
 
+/* ---------- Aantal kinderen ---------- */
+var KIDS=[6,7,8,9,10], N=9;
+try{var sv=parseInt(localStorage.getItem("ckc-kinderen"),10);if(KIDS.indexOf(sv)>=0)N=sv}catch(e){}
+function plan(n){
+  return {
+    groepen:{6:[3,3],7:[4,3],8:[4,4],9:[3,3,3],10:[4,3,3]}[n],
+    team:{6:3,7:3,8:4,9:4,10:5}[n],
+    joker:n===7||n===9,
+    veld:{6:"20 × 13",7:"20 × 13",8:"25 × 15",9:"25 × 15",10:"30 × 20"}[n]
+  };
+}
+function lijst(a){return a.length<2?String(a[0]):a.slice(0,-1).join(", ")+" en "+a[a.length-1]}
+function vakTekst(p){return "<strong>"+p.groepen.length+" vakken</strong> met "+lijst(p.groepen)+" kinderen."}
+var INDELING={
+  a:function(n,p){return vakTekst(p)+" In elk vak twee rijtjes tegenover elkaar. Met 3 kinderen in een vak staan er 2 aan de ene kant en 1 aan de andere."},
+  b:function(n,p){return vakTekst(p)+" Rollen: opbouwer, aanvaller, verdediger. Na 3 à 4 beurten draait iedereen een rol door."+
+    (p.groepen.indexOf(4)>=0?" In een groep van 4 is de vierde een tweede opbouwer: de opbouwers wisselen elke beurt af.":"")},
+  c:function(n,p){return vakTekst(p)+" Groepjes van 3 spelen 2 tegen 1."+
+    (p.groepen.indexOf(4)>=0?" Een groep van 4 speelt 3 tegen 1. Gaat dat te makkelijk, speel dan 2 tegen 2.":"")},
+  d:function(n,p){return {
+    6:"<strong>3 tegen 3</strong> op ongeveer 20 × 13 meter. Iedereen speelt.",
+    7:"<strong>3 tegen 3 plus een joker</strong> op ongeveer 20 × 13 meter. De joker speelt altijd mee met de ploeg die de bal heeft en draagt een hesje in een andere kleur. Wissel de joker elke 3 minuten.",
+    8:"<strong>4 tegen 4</strong> op ongeveer 25 × 15 meter. Schuif daarvoor de hoekhoedjes en doeltjes een paar meter op.",
+    9:"<strong>4 tegen 4 plus een joker</strong> op ongeveer 25 × 15 meter. De joker speelt mee met de ploeg die de bal heeft. Wissel de joker elke 3 minuten.",
+    10:"<strong>5 tegen 5</strong> op ongeveer 30 × 20 meter. Met twee trainers kan ook: twee veldjes, 3 tegen 3 en 2 tegen 2, elke 5 minuten wisselen. Dan heb je 4 hoedjes en 2 doeltjes extra nodig."
+  }[n]}
+};
+function materiaal(n){
+  var p=plan(n), v=p.groepen.length, r=[
+    ["Oranje hoedjes","hoeken van de vakken en het partijveld",4*v+4,4*v+8],
+    ["Gele hoedjes","verdedigerslijn in oefening B",5*v,5*v+2],
+    ["Pionnen","poortjes in A en B",4*v,4*v+2],
+    ["Ballen","plus reserve voor weggerolde ballen",v+2,Math.max(n,v+4)],
+    ["Kleine doeltjes","geen doeltjes? 2 pionnen per doel",2,2],
+    ["Hesjes","één ploeg draagt hesjes",p.team,p.team+2]
+  ];
+  if(p.joker)r.push(["Hesje, andere kleur","voor de joker",1,2]);
+  return r;
+}
+function renderOverview(){
+  var p=plan(N), v=p.groepen.length;
+  document.getElementById("matBox").innerHTML=
+    '<table class="mat"><thead><tr><th>Bij '+N+' kinderen</th><th class="num">Minimaal</th><th class="num">Advies</th></tr></thead><tbody>'+
+    materiaal(N).map(function(m){return '<tr><td>'+m[0]+'<small>'+m[1]+'</small></td><td class="num">'+m[2]+'</td><td class="num">'+m[3]+'</td></tr>'}).join("")+
+    '</tbody></table><p class="note">Advies is ruimer gerekend, zodat je een kapotte pion of lekke bal meteen kunt vervangen. Neem ook een balpomp mee.</p>';
+  document.getElementById("indTitle").textContent="Indeling bij "+N+" kinderen";
+  document.getElementById("indBox").innerHTML=
+    '<p>Zet <strong>'+v+' vakken van 10 × 10 meter</strong> naast elkaar, met een paar meter ertussen, en één partijveld van ongeveer '+p.veld+' meter.</p>'+
+    DRILLS.map(function(d){return '<div class="block"><h3>'+d.letter+'. '+d.tab+'</h3><p>'+INDELING[d.id](N,p)+'</p></div>'}).join("");
+}
+function renderInfo(){
+  if(!D)return;
+  document.getElementById("info").innerHTML='<h2>'+D.letter+'. '+D.title+'</h2><p class="time">'+D.time+'</p>'+
+    '<p class="goal">'+D.goal+'</p>'+
+    '<div class="block"><h3>Neerzetten</h3><p>'+D.setup+'</p></div>'+
+    '<div class="block"><h3>Met '+N+' kinderen</h3><p>'+INDELING[D.id](N,plan(N))+'</p></div>'+
+    '<div class="block"><h3>Coachen</h3><ul>'+D.coach.map(function(c){return"<li>"+c+"</li>"}).join("")+'</ul></div>'+
+    '<div class="block"><h3>Voor O10</h3><p>'+D.o10+'</p></div>';
+}
+var kidsEl=document.getElementById("kids");
+KIDS.forEach(function(k){
+  var b=document.createElement("button");b.type="button";b.textContent=k;b.setAttribute("aria-label",k+" kinderen");
+  b.addEventListener("click",function(){setN(k)});kidsEl.appendChild(b);
+});
+function setN(k){
+  N=k; try{localStorage.setItem("ckc-kinderen",String(k))}catch(e){}
+  Array.prototype.forEach.call(kidsEl.children,function(b){b.setAttribute("aria-pressed",b.textContent===String(k)?"true":"false")});
+  renderOverview(); renderInfo();
+}
+setN(N);
+
 /* ---------- UI ---------- */
 var tabs=document.getElementById("tabs"), ov=document.getElementById("ov"), dr=document.getElementById("drill");
 var views=[{id:"overzicht",letter:"",tab:"Overzicht"}].concat(DRILLS);
@@ -459,18 +567,13 @@ DRILLS.forEach(function(d,i){
 });
 function select(i){
   Array.prototype.forEach.call(tabs.children,function(b,j){b.setAttribute("aria-selected",j===i?"true":"false")});
-  if(i===0){ov.hidden=false;dr.hidden=true;D=null;if(location.hash)history.replaceState(null,"",location.pathname+location.search);return}
+  if(i===0){ov.hidden=false;dr.hidden=true;D=null;if(location.hash){try{history.replaceState(null,"",location.href.split("#")[0])}catch(e){}}return}
   ov.hidden=true;dr.hidden=false;D=DRILLS[i-1];
   build(D);
   var dots=document.getElementById("dots"); dots.innerHTML="";
   D.steps.forEach(function(){dots.appendChild(document.createElement("i"))});
   document.getElementById("lgShadow").style.display=D.shadow?"":"none";
-  var info=document.getElementById("info");
-  info.innerHTML='<h2>'+D.letter+'. '+D.title+'</h2><p class="time">'+D.time+'</p>'+
-    '<p class="goal">'+D.goal+'</p>'+
-    '<div class="block"><h3>Neerzetten</h3><p>'+D.setup+'</p></div>'+
-    '<div class="block"><h3>Coachen</h3><ul>'+D.coach.map(function(c){return"<li>"+c+"</li>"}).join("")+'</ul></div>'+
-    '<div class="block"><h3>Voor O10</h3><p>'+D.o10+'</p></div>';
+  renderInfo();
   goStep(0,true);
   if(!playing)showFinal();
   location.hash=D.id;
