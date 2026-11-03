@@ -353,7 +353,7 @@ var svg=document.getElementById("field");
 var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 var D=null, pos={}, from={}, stepIdx=0, stepT=0, playing=!reduce, speed=1, lastTs=null;
 var nodes={}, gShadow, gTrails, gActors, curTrails=[], LAYER=null, holder="b", lastRot=null;
-function wantRot(dr){return dr.h>dr.w*1.15 && window.innerWidth>window.innerHeight}
+function wantRot(dr){var fa=(dr.w+2*dr.m)/(dr.h+2*dr.m), land=window.innerWidth>window.innerHeight;return land?fa<1/1.15:fa>1.15}
 
 function initialPos(dr){var r={};for(var k in dr.actors)r[k]=dr.actors[k].p.slice();return r}
 function posAtStep(dr,idx){

@@ -339,7 +339,8 @@ function lerp(a,b,t){return[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t]}
 var svg=document.getElementById("field");
 var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 var D=null, pos={}, from={}, stepIdx=0, stepT=0, playing=!reduce, speed=1, lastTs=null;
-var nodes={}, gShadow, gTrails, gActors, curTrails=[];
+var nodes={}, gShadow, gTrails, gActors, curTrails=[], LAYER=null, lastRot=null;
+function wantRot(dr){var fa=(dr.w+2*dr.m)/(dr.h+2*dr.m), land=window.innerWidth>window.innerHeight;return land?fa<1/1.15:fa>1.15}
 
 function initialPos(dr){var r={};for(var k in dr.actors)r[k]=dr.actors[k].p.slice();return r}
 function posAtStep(dr,idx){
@@ -357,33 +358,38 @@ function build(dr){
   var mk=el("marker",{id:"arr",viewBox:"0 0 10 10",refX:"7",refY:"5",markerWidth:"4",markerHeight:"4",orient:"auto-start-reverse"},defs);
   el("path",{d:"M0 0 L10 5 L0 10 z",fill:"#fff"},mk);
   var cp=el("clipPath",{id:"clipF"},defs); el("rect",{x:-m,y:-m,width:dr.w+2*m,height:dr.h+2*m},cp);
+  var rot=wantRot(dr); lastRot=rot;
+  LAYER=el("g",rot?{transform:"rotate(-90)"}:{},svg);
+  if(rot)svg.setAttribute("viewBox",(-m)+" "+(-(dr.w+m))+" "+(dr.h+2*m)+" "+(dr.w+2*m));
   // gras
-  el("rect",{x:-m,y:-m,width:dr.w+2*m,height:dr.h+2*m,fill:"#3E8A55"},svg);
+  el("rect",{x:-m,y:-m,width:dr.w+2*m,height:dr.h+2*m,fill:"#3E8A55"},LAYER);
   var stripes=8, sw=(dr.w+2*m)/stripes;
-  for(var i=0;i<stripes;i+=2)el("rect",{x:-m+i*sw,y:-m,width:sw,height:dr.h+2*m,fill:"#438F5A"},svg);
-  el("rect",{x:0,y:0,width:dr.w,height:dr.h,fill:"none",stroke:"rgba(255,255,255,.85)","stroke-width":0.08*s/0.55},svg);
-  if(dr.midline)el("line",{x1:dr.w/2,y1:0,x2:dr.w/2,y2:dr.h,stroke:"rgba(255,255,255,.6)","stroke-width":0.07},svg);
+  for(var i=0;i<stripes;i+=2)el("rect",{x:-m+i*sw,y:-m,width:sw,height:dr.h+2*m,fill:"#438F5A"},LAYER);
+  el("rect",{x:0,y:0,width:dr.w,height:dr.h,fill:"none",stroke:"rgba(255,255,255,.85)","stroke-width":0.08*s/0.55},LAYER);
+  if(dr.midline)el("line",{x1:dr.w/2,y1:0,x2:dr.w/2,y2:dr.h,stroke:"rgba(255,255,255,.6)","stroke-width":0.07},LAYER);
   if(dr.yline){
     var y=dr.yline;
-    el("line",{x1:y[0][0],y1:y[0][1],x2:y[1][0],y2:y[1][1],stroke:"#F5D020","stroke-width":0.14,"stroke-dasharray":"0.5 0.35"},svg);
+    el("line",{x1:y[0][0],y1:y[0][1],x2:y[1][0],y2:y[1][1],stroke:"#F5D020","stroke-width":0.14,"stroke-dasharray":"0.5 0.35"},LAYER);
     for(var x=0;x<=dr.w;x+=dr.w/2)cone(x,y[0][1],"#F5D020",s*0.55);
   }
   (dr.goals||[]).forEach(function(g){
     var gx=g[0], gy=g[1], left=gx===0;
-    el("rect",{x:left?gx-0.9:gx,y:gy-1.2,width:0.9,height:2.4,fill:"rgba(255,255,255,.18)",stroke:"#fff","stroke-width":0.12},svg);
+    el("rect",{x:left?gx-0.9:gx,y:gy-1.2,width:0.9,height:2.4,fill:"rgba(255,255,255,.18)",stroke:"#fff","stroke-width":0.12},LAYER);
   });
-  gShadow=el("g",{"clip-path":"url(#clipF)"},svg);
+  gShadow=el("g",{"clip-path":"url(#clipF)"},LAYER);
   (dr.cones||[]).forEach(function(c){cone(c[0],c[1],"#FF7A1A",s*0.6)});
   (dr.gates||[]).forEach(function(g){
-    el("line",{x1:g[0][0],y1:g[0][1],x2:g[1][0],y2:g[1][1],stroke:"rgba(255,255,255,.5)","stroke-width":0.06,"stroke-dasharray":"0.2 0.2"},svg);
+    el("line",{x1:g[0][0],y1:g[0][1],x2:g[1][0],y2:g[1][1],stroke:"rgba(255,255,255,.5)","stroke-width":0.06,"stroke-dasharray":"0.2 0.2"},LAYER);
     pion(g[0][0],g[0][1],s); pion(g[1][0],g[1][1],s);
   });
   (dr.labels||[]).forEach(function(l){
-    var t=el("text",{x:l.x,y:l.y,"text-anchor":l.a||"start","font-size":0.55,fill:"#FFF6C2","font-family":"Atkinson Hyperlegible, system-ui, sans-serif"},svg);
+    var ta={x:l.x,y:l.y,"text-anchor":l.a||"start","font-size":0.55,fill:"#FFF6C2","font-family":"Atkinson Hyperlegible, system-ui, sans-serif"};
+    if(rot)ta.transform="rotate(90 "+l.x+" "+l.y+")";
+    var t=el("text",ta,LAYER);
     t.textContent=l.t;
   });
-  gTrails=el("g",{},svg);
-  gActors=el("g",{},svg);
+  gTrails=el("g",{},LAYER);
+  gActors=el("g",{},LAYER);
   nodes={};
   for(var k in dr.actors){
     var a=dr.actors[k], g=el("g",{},gActors), n={g:g,t:a.t};
@@ -399,8 +405,8 @@ function build(dr){
   // bal bovenop
   gActors.appendChild(nodes.ball.g);
 }
-function cone(x,y,col,s){var h=s*0.9;el("path",{d:"M"+(x-h*0.6)+" "+(y+h*0.45)+" L"+x+" "+(y-h*0.55)+" L"+(x+h*0.6)+" "+(y+h*0.45)+" Z",fill:col,stroke:"rgba(0,0,0,.25)","stroke-width":0.04},svg)}
-function pion(x,y,s){el("circle",{cx:x,cy:y,r:s*0.42,fill:"#FF7A1A",stroke:"#fff","stroke-width":s*0.12},svg);el("circle",{cx:x,cy:y,r:s*0.14,fill:"#fff"},svg)}
+function cone(x,y,col,s){var h=s*0.9;el("path",{d:"M"+(x-h*0.6)+" "+(y+h*0.45)+" L"+x+" "+(y-h*0.55)+" L"+(x+h*0.6)+" "+(y+h*0.45)+" Z",fill:col,stroke:"rgba(0,0,0,.25)","stroke-width":0.04},LAYER)}
+function pion(x,y,s){el("circle",{cx:x,cy:y,r:s*0.42,fill:"#FF7A1A",stroke:"#fff","stroke-width":s*0.12},LAYER);el("circle",{cx:x,cy:y,r:s*0.14,fill:"#fff"},LAYER)}
 
 /* ---------- Trails ---------- */
 function wavyPts(a,b,u){
@@ -597,7 +603,6 @@ function select(i){
   var dots=document.getElementById("dots"); dots.innerHTML="";
   D.steps.forEach(function(){dots.appendChild(document.createElement("i"))});
   document.getElementById("lgShadow").style.display=D.shadow?"":"none";
-  document.querySelector(".stage").classList.toggle("wide",D.w/D.h>1.3);
   renderInfo();
   goStep(0,true);
   if(!playing)showFinal();
@@ -637,6 +642,10 @@ var start=0, h=(location.hash||"").replace("#","");
 DRILLS.forEach(function(d,i){if(d.id===h)start=i+1});
 select(start);
 window.addEventListener("hashchange",function(){var h2=location.hash.replace("#","");DRILLS.forEach(function(d,i){if(d.id===h2&&D!==d)select(i+1)});if(!h2&&D)select(0)});
+window.addEventListener("resize",function(){
+  if(!D||wantRot(D)===lastRot)return;
+  var keep=stepIdx; build(D); goStep(keep,true); if(!playing)showFinal();
+});
 requestAnimationFrame(tick);
 })();
 </script>
