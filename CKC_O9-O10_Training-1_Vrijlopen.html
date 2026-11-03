@@ -121,6 +121,23 @@ svg#field{width:100%;height:auto;display:block;border-radius:8px;touch-action:ma
 .stage.fs .dots i{background:#2A3B31}
 .stage.fs .dots i.on{background:#E4ECE6}
 body.fsopen{overflow:hidden}
+.stage.fs{padding-left:calc(env(safe-area-inset-left,0px) + 8px);padding-right:calc(env(safe-area-inset-right,0px) + 8px)}
+.hint{display:none;color:#9DB0A4;font-size:14px;padding:6px 4px 0}
+@media (orientation: portrait){.stage.fs.wide .hint{display:block}}
+@media (orientation: landscape) and (max-height: 560px){
+  .stage.fs{display:grid;grid-template-columns:minmax(0,1fr) minmax(190px,30%);grid-template-rows:auto minmax(0,1fr) auto;
+    gap:4px 14px;padding-top:calc(env(safe-area-inset-top,0px) + 6px);padding-bottom:calc(env(safe-area-inset-bottom,0px) + 6px)}
+  .stage.fs>svg#field{grid-column:1;grid-row:1 / -1;width:100%;height:100%;min-height:0}
+  .stage.fs .dots{grid-column:2;grid-row:1;padding-top:4px}
+  .stage.fs .caption{grid-column:2;grid-row:2;overflow-y:auto;padding:6px 2px}
+  .stage.fs .caption .t{font-size:17px}
+  .stage.fs .controls{grid-column:2;grid-row:3;gap:6px;padding:0}
+  .stage.fs .controls .sp{display:none}
+  .stage.fs .controls button{min-height:38px;padding:6px 10px;font-size:14px;flex:1 1 auto}
+  .stage.fs.notext{grid-template-columns:minmax(0,1fr) auto}
+  .stage.fs.notext .controls{flex-direction:column}
+  .stage.fs.notext .dots{display:none}
+}
 @media (prefers-reduced-motion: reduce){*{scroll-behavior:auto}}
 </style>
 </head>
@@ -191,6 +208,7 @@ body.fsopen{overflow:hidden}
         <button id="bTxt" aria-pressed="false" hidden>Tekst uit</button>
         <button id="bFs">Volledig scherm</button>
       </div>
+      <div class="hint">Tip: draai je telefoon voor een groter veld.</div>
       <div class="legend">
         <span><svg viewBox="0 0 30 14"><circle cx="15" cy="7" r="6" fill="var(--team)" stroke="#fff" stroke-width="1.5"/></svg>Ons team</span>
         <span><svg viewBox="0 0 30 14"><circle cx="15" cy="7" r="6" fill="var(--def)" stroke="#fff" stroke-width="1.5"/></svg>Verdediger</span>
@@ -233,7 +251,8 @@ var DRILLS=[
   goal:"Warm worden en veel balcontacten, met rechts én links.",
   setup:"De onderste helft van het vak van oefening B, tot aan de gele lijn (10 × 5 meter). 2 pionnen als poortje in het midden, 1 bal per vak.",
   coach:["Wissel rechts en links af.","Bal dicht bij de voet houden.","Doe elke variatie één keer zelf voor."],
-  o10:"Moeilijker: hoger tempo, of alleen met de buitenkant van de voet."
+  o10:"Moeilijker: hoger tempo, of alleen met de buitenkant van de voet.",
+  ombouw:"Naar B: zet per vak de 2 pionnen van het poortje om naar rechtsboven in het vak, waar de aanvaller naartoe dribbelt."
 },
 {
   id:"b", letter:"B", tab:"2 tegen 1", title:"2 tegen 1: uit de rug van de verdediger", time:"10 minuten",
@@ -257,7 +276,8 @@ var DRILLS=[
   goal:"De aanvaller leert uit de rug van de verdediger te lopen, zodat de bal bij hem kan komen.",
   setup:"Vak van 10 × 10 meter. Gele hoedjes als lijn in het midden: de verdediger mag alleen over die lijn bewegen. 2 pionnen als poortje. Dezelfde vakken als de warming-up.",
   coach:["Staat de aanvaller in de schaduw? Leg stil en vraag: “Kan de bal nu bij jou komen?”","De opbouwer speelt pas in als de aanvaller vrij staat.","Leg alleen stil als het doel niet lukt. Lukt het wel, laat ze doorspelen."],
-  o10:"Moeilijker: de verdediger mag van de lijn af en de bal onderscheppen. Makkelijker: de verdediger blijft stilstaan."
+  o10:"Moeilijker: de verdediger mag van de lijn af en de bal onderscheppen. Makkelijker: de verdediger blijft stilstaan.",
+  ombouw:"Naar C: niets verplaatsen. De gele lijn en het poortje blijven liggen en doen gewoon niet mee."
 },
 {
   id:"c", letter:"C", tab:"2 tegen 1 vrij", title:"2 tegen 1 vrij: zonder vaste looplijnen", time:"10 minuten",
@@ -279,7 +299,8 @@ var DRILLS=[
   goal:"Hetzelfde principe, nu zonder vaste looplijnen: zelf de vrije plek vinden.",
   setup:"Hetzelfde vak als oefening B. De gele hoedjes en het poortje mogen blijven liggen. 1 bal per vak.",
   coach:["Na je pass meteen weer vrijlopen.","Met de bal: naar de vrije ruimte, niet naar de verdediger toe.","Spelletje: 5 passes achter elkaar is een punt."],
-  o10:"Moeilijker: kleiner vak (8 × 8). Makkelijker: groter vak, of 3 tegen 1."
+  o10:"Moeilijker: kleiner vak (8 × 8). Makkelijker: groter vak, of 3 tegen 1.",
+  ombouw:"Naar D: pak 4 oranje hoedjes uit de vakken voor de hoeken van het partijveld en zet de doeltjes neer."
 },
 {
   id:"d", letter:"D", tab:"Partijspel", title:"Partijspel 3 tegen 3", time:"30 minuten",
@@ -293,7 +314,7 @@ var DRILLS=[
     ball:{t:"ball",p:[4.6,6.3]}
   },
   steps:[
-    {d:2.6,c:"Partijspel 3 tegen 3 op kleine doeltjes. Vanaf nu leg je niet meer stil: coach tijdens het spel."},
+    {d:2.6,c:"Partijspel op kleine doeltjes (hier 3 tegen 3). Vanaf nu leg je niet meer stil: coach tijdens het spel."},
     {d:2.2,c:"Spelers zonder bal maken zich aanspeelbaar.",mv:{b2:["run",[11.2,4.4]],b3:["run",[12,11.2]],o1:["run",[6.6,3.8]]}},
     {d:1.4,c:"Inspelen op de vrije speler.",mv:{ball:["pass",[10.75,4.55]],o3:["run",[14.2,5.2]]}},
     {d:2.2,c:"Dribbelen naar de ruimte. De rest loopt mee.",mv:{b2:["none",[13.6,3.9]],ball:["dribble",[14.1,4.2]],b1:["run",[9,6.6]],o3:["run",[15.4,4.9]],o2:["run",[12.4,8.2]]}},
@@ -345,7 +366,7 @@ function build(dr){
   if(dr.yline){
     var y=dr.yline;
     el("line",{x1:y[0][0],y1:y[0][1],x2:y[1][0],y2:y[1][1],stroke:"#F5D020","stroke-width":0.14,"stroke-dasharray":"0.5 0.35"},svg);
-    for(var x=0;x<=dr.w;x+=2.5)cone(x,y[0][1],"#F5D020",s*0.55);
+    for(var x=0;x<=dr.w;x+=dr.w/2)cone(x,y[0][1],"#F5D020",s*0.55);
   }
   (dr.goals||[]).forEach(function(g){
     var gx=g[0], gy=g[1], left=gx===0;
@@ -503,16 +524,17 @@ var INDELING={
     7:"<strong>3 tegen 3 plus een joker</strong> op ongeveer 20 × 13 meter. De joker speelt altijd mee met de ploeg die de bal heeft en draagt een hesje in een andere kleur. Wissel de joker elke 3 minuten.",
     8:"<strong>4 tegen 4</strong> op ongeveer 25 × 15 meter. Schuif daarvoor de hoekhoedjes en doeltjes een paar meter op.",
     9:"<strong>4 tegen 4 plus een joker</strong> op ongeveer 25 × 15 meter. De joker speelt mee met de ploeg die de bal heeft. Wissel de joker elke 3 minuten.",
-    10:"<strong>5 tegen 5</strong> op ongeveer 30 × 20 meter. Met twee trainers kan ook: twee veldjes, 3 tegen 3 en 2 tegen 2, elke 5 minuten wisselen. Dan heb je 4 hoedjes en 2 doeltjes extra nodig."
+    10:"<strong>5 tegen 5</strong> op ongeveer 30 × 20 meter. Met twee trainers kan ook: twee veldjes, 3 tegen 3 en 2 tegen 2, elke 5 minuten wisselen. Haal daarvoor 4 extra hoedjes uit de vakken en gebruik pionnen als doeltjes."
   }[n]}
 };
+function adv(x){return x+Math.max(2,Math.ceil(x*0.25))}
 function materiaal(n){
   var p=plan(n), v=p.groepen.length, r=[
-    ["Oranje hoedjes","hoeken van de vakken en het partijveld",4*v+4,4*v+8],
-    ["Gele hoedjes","verdedigerslijn in oefening B",5*v,5*v+2],
-    ["Pionnen","poortjes in A en B",4*v,4*v+2],
+    ["Oranje hoedjes","4 per vak; voor het partijveld pak je er 4 uit de vakken",4*v,adv(4*v)],
+    ["Gele hoedjes","3 per vak: de verdedigerslijn",3*v,adv(3*v)],
+    ["Pionnen","2 per vak; ze verhuizen van poortje A naar poortje B",2*v,adv(2*v)],
     ["Ballen","plus reserve voor weggerolde ballen",v+2,Math.max(n,v+4)],
-    ["Kleine doeltjes","geen doeltjes? 2 pionnen per doel",2,2],
+    ["Kleine doeltjes","geen doeltjes? Gebruik 2 pionnen per doel",2,2],
     ["Hesjes","één ploeg draagt hesjes",p.team,p.team+2]
   ];
   if(p.joker)r.push(["Hesje, andere kleur","voor de joker",1,2]);
@@ -523,11 +545,12 @@ function renderOverview(){
   document.getElementById("matBox").innerHTML=
     '<table class="mat"><thead><tr><th>Bij '+N+' kinderen</th><th class="num">Minimaal</th><th class="num">Advies</th></tr></thead><tbody>'+
     materiaal(N).map(function(m){return '<tr><td>'+m[0]+'<small>'+m[1]+'</small></td><td class="num">'+m[2]+'</td><td class="num">'+m[3]+'</td></tr>'}).join("")+
-    '</tbody></table><p class="note">Advies is ruimer gerekend, zodat je een kapotte pion of lekke bal meteen kunt vervangen. Neem ook een balpomp mee.</p>';
+    '</tbody></table><p class="note">Gerekend per opstelling, niet per oefening: tussen de oefeningen verplaats je een paar pionnen. Advies is ruimer gerekend, zodat je een kapotte pion of lekke bal meteen kunt vervangen. Neem ook een balpomp mee.</p>';
   document.getElementById("indTitle").textContent="Indeling bij "+N+" kinderen";
   document.getElementById("indBox").innerHTML=
     '<p>Zet <strong>'+v+' vakken van 10 × 10 meter</strong> naast elkaar, met een paar meter ertussen, en één partijveld van ongeveer '+p.veld+' meter.</p>'+
-    DRILLS.map(function(d){return '<div class="block"><h3>'+d.letter+'. '+d.tab+'</h3><p>'+INDELING[d.id](N,p)+'</p></div>'}).join("");
+    DRILLS.map(function(d){return '<div class="block"><h3>'+d.letter+'. '+d.tab+'</h3><p>'+INDELING[d.id](N,p)+'</p>'+
+      (d.ombouw?'<p class="note">'+d.ombouw+'</p>':'')+'</div>'}).join("");
 }
 function renderInfo(){
   if(!D)return;
@@ -536,7 +559,8 @@ function renderInfo(){
     '<div class="block"><h3>Neerzetten</h3><p>'+D.setup+'</p></div>'+
     '<div class="block"><h3>Met '+N+' kinderen</h3><p>'+INDELING[D.id](N,plan(N))+'</p></div>'+
     '<div class="block"><h3>Coachen</h3><ul>'+D.coach.map(function(c){return"<li>"+c+"</li>"}).join("")+'</ul></div>'+
-    '<div class="block"><h3>Voor O10</h3><p>'+D.o10+'</p></div>';
+    '<div class="block"><h3>Voor O10</h3><p>'+D.o10+'</p></div>'+
+    (D.ombouw?'<div class="block"><h3>Ombouwen</h3><p>'+D.ombouw+'</p></div>':'');
 }
 var kidsEl=document.getElementById("kids");
 KIDS.forEach(function(k){
@@ -573,6 +597,7 @@ function select(i){
   var dots=document.getElementById("dots"); dots.innerHTML="";
   D.steps.forEach(function(){dots.appendChild(document.createElement("i"))});
   document.getElementById("lgShadow").style.display=D.shadow?"":"none";
+  document.querySelector(".stage").classList.toggle("wide",D.w/D.h>1.3);
   renderInfo();
   goStep(0,true);
   if(!playing)showFinal();
