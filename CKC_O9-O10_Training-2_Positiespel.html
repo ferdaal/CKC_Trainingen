@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>O9-O10 Training 2: positiespel 2 tegen 1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#E9EEEA; --surface:#FFFFFF; --ink:#16241C; --muted:#4E5F55; --line:#C9D3CC;
+  --team:#1E5BD8; --def:#F08A1C; --accent:#1E5BD8; --chip:#DCE5DF;
+  --ok:#22B35A; --bad:#E5484D;
+  color-scheme: light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E1813; --surface:#16231C; --ink:#E4ECE6; --muted:#9DB0A4; --line:#2A3B31;
+    --team:#5B8CFF; --def:#FFA040; --accent:#7EA6FF; --chip:#22342A;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E1813; --surface:#16231C; --ink:#E4ECE6; --muted:#9DB0A4; --line:#2A3B31;
+  --team:#5B8CFF; --def:#FFA040; --accent:#7EA6FF; --chip:#22342A;
+  color-scheme: dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  font-size:17px;line-height:1.5}
+.wrap{max-width:1120px;margin:0 auto;padding:20px 18px 48px}
+header h1{font-family:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;font-weight:700;
+  font-size:clamp(34px,6vw,54px);line-height:1;margin:0 0 6px;letter-spacing:.2px}
+header p{margin:0;color:var(--muted);max-width:62ch}
+nav{display:flex;gap:6px;overflow-x:auto;margin:20px -18px 18px;padding:0 18px 4px;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+nav button{flex:0 0 auto;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);
+  font:inherit;font-size:15px;padding:8px 14px;border-radius:999px;cursor:pointer;display:flex;gap:8px;align-items:center}
+nav button .l{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:18px;
+  width:24px;height:24px;border-radius:50%;background:var(--chip);display:grid;place-items:center;line-height:1}
+nav button[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+nav button[aria-selected="true"] .l{background:var(--bg);color:var(--ink)}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:22px;align-items:start}
+@media (max-width:860px){.grid{grid-template-columns:1fr}}
+.stage{background:var(--surface);border-radius:14px;padding:12px;border:1px solid var(--line)}
+svg#field{width:100%;height:auto;display:block;border-radius:8px;touch-action:manipulation}
+.caption{min-height:4.6em;padding:12px 6px 4px}
+.caption .n{color:var(--muted);font-size:14px}
+.caption .t{font-size:19px;line-height:1.4;margin-top:2px}
+.controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:6px 4px 2px}
+.controls button{font:inherit;font-size:15px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);
+  border-radius:10px;padding:8px 12px;cursor:pointer;min-height:42px}
+.controls button.primary{background:var(--ink);color:var(--bg);border-color:var(--ink);min-width:96px}
+.controls .sp{flex:1}
+.dots{display:flex;gap:5px;padding:8px 6px 2px}
+.dots i{height:5px;flex:1;border-radius:3px;background:var(--line)}
+.dots i.on{background:var(--ink)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:14px;color:var(--muted);padding:10px 6px 2px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend svg{width:30px;height:14px}
+.info h2{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:32px;line-height:1.05;margin:0 0 4px}
+.info .time{color:var(--muted);margin:0 0 14px}
+.info .goal{font-size:20px;line-height:1.4;margin:0 0 18px;padding-left:14px;border-left:4px solid var(--team)}
+.block{margin:0 0 16px}
+.block h3{font-size:15px;margin:0 0 4px;color:var(--muted);font-weight:700}
+.block p{margin:0 0 6px}
+.block ul{margin:0;padding-left:20px}
+.block li{margin:0 0 6px}
+.overview{display:grid;gap:22px}
+.timeline{display:flex;border-radius:10px;overflow:hidden;border:1px solid var(--line);background:var(--surface)}
+.timeline button{font:inherit;border:0;border-right:1px solid var(--line);background:none;color:var(--ink);text-align:left;
+  padding:12px;cursor:pointer;min-width:0}
+.timeline button:last-child{border-right:0}
+.timeline b{display:block;font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-size:22px;line-height:1.1}
+.timeline small{color:var(--muted);font-size:14px}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+@media (max-width:760px){.cols{grid-template-columns:1fr}.timeline{flex-direction:column}.timeline button{border-right:0;border-bottom:1px solid var(--line)}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.card h2{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:26px;margin:0 0 8px}
+.card p,.card li{margin:0 0 8px}
+.card ul{padding-left:20px;margin:0}
+.back{display:inline-block;color:var(--muted);text-decoration:none;font-size:15px;margin:0 0 10px;padding:6px 0}
+.back:hover{color:var(--ink)}
+.back:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:4px}
+.count{display:flex;align-items:center;gap:10px;margin-top:14px;flex-wrap:wrap}
+.count>span{color:var(--muted);font-size:15px}
+#kids{display:flex;gap:4px}
+#kids button{width:46px;height:44px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);
+  font:inherit;font-weight:700;font-size:18px;cursor:pointer}
+#kids button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+#kids button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.mat{width:100%;border-collapse:collapse;font-size:16px;margin:4px 0 10px}
+.mat th,.mat td{text-align:left;padding:7px 4px;border-bottom:1px solid var(--line);vertical-align:top}
+.mat th{font-size:14px;color:var(--muted);font-weight:700}
+.mat .num{text-align:right;font-variant-numeric:tabular-nums;width:76px}
+.mat td.num{font-weight:700}
+.mat small{display:block;color:var(--muted);font-size:14px}
+.note{color:var(--muted);font-size:15px}
+.cols3{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px}
+[hidden]{display:none!important}
+.stage.fs{position:fixed;inset:0;z-index:50;border-radius:0;border:0;display:flex;flex-direction:column;
+  padding:calc(env(safe-area-inset-top,0px) + 8px) 8px calc(env(safe-area-inset-bottom,0px) + 8px);
+  background:#0E1813;color:#E4ECE6}
+
+.stage.fs .legend{display:none}
+.stage.fs>*{flex:0 0 auto}
+.stage.fs>svg#field{flex:1 1 auto;min-height:0;height:100%;border-radius:6px}
+.stage.fs .caption{min-height:0}
+.stage.fs .caption .n{color:#9DB0A4}
+.stage.fs .caption .t{font-size:22px}
+.stage.fs.notext .caption{display:none}
+.stage.fs .controls button{background:#16231C;color:#E4ECE6;border-color:#2A3B31}
+.stage.fs .controls button.primary{background:#E4ECE6;color:#0E1813;border-color:#E4ECE6}
+.stage.fs .dots i{background:#2A3B31}
+.stage.fs .dots i.on{background:#E4ECE6}
+body.fsopen{overflow:hidden}
+.stage.fs{padding-left:calc(env(safe-area-inset-left,0px) + 8px);padding-right:calc(env(safe-area-inset-right,0px) + 8px)}
+.hint{display:none;color:#9DB0A4;font-size:14px;padding:6px 4px 0}
+@media (orientation: portrait){.stage.fs.wide .hint{display:block}}
+@media (orientation: landscape) and (max-height: 560px){
+  .stage.fs{display:grid;grid-template-columns:minmax(0,1fr) minmax(190px,30%);grid-template-rows:auto minmax(0,1fr) auto;
+    gap:4px 14px;padding-top:calc(env(safe-area-inset-top,0px) + 6px);padding-bottom:calc(env(safe-area-inset-bottom,0px) + 6px)}
+  .stage.fs>svg#field{grid-column:1;grid-row:1 / -1;width:100%;height:100%;min-height:0}
+  .stage.fs .dots{grid-column:2;grid-row:1;padding-top:4px}
+  .stage.fs .caption{grid-column:2;grid-row:2;overflow-y:auto;padding:6px 2px}
+  .stage.fs .caption .t{font-size:17px}
+  .stage.fs .controls{grid-column:2;grid-row:3;gap:6px;padding:0}
+  .stage.fs .controls .sp{display:none}
+  .stage.fs .controls button{min-height:38px;padding:6px 10px;font-size:14px;flex:1 1 auto}
+  .stage.fs.notext{grid-template-columns:minmax(0,1fr) auto}
+  .stage.fs.notext .controls{flex-direction:column}
+  .stage.fs.notext .dots{display:none}
+}
+@media (prefers-reduced-motion: reduce){*{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="back" href="./#O9-O10">&#8592; Alle trainingen</a>
+    <h1>Training 2: positiespel 2 tegen 1</h1>
+    <p>O9-O10. Eén leerdoel voor de hele training: met de bal maak je samen 2 tegen 1. Dit lukt niet in één keer: herhaal deze training een paar weken.</p>
+    <div class="count" role="group" aria-label="Aantal kinderen"><span>Aantal kinderen</span><div id="kids"></div></div>
+  </header>
+
+  <nav role="tablist" id="tabs"></nav>
+
+  <section id="ov" class="overview">
+    <div class="timeline" id="timeline"></div>
+    <div class="cols">
+      <div class="card">
+        <h2>Materiaal klaarzetten</h2>
+        <div id="matBox"></div>
+      </div>
+      <div class="card">
+        <h2 id="indTitle">Indeling</h2>
+        <div id="indBox"></div>
+      </div>
+    </div>
+    <div class="cols3">
+      <div class="card">
+        <h2>Het idee</h2>
+        <p>Vandaag draait alles om 2 tegen 1: met de bal ben je met z’n tweeën tegen één verdediger. Dat maak je op twee manieren. Door vrij te lopen, zoals in training 1. En door mee te gaan als je teamgenoot de bal kaatst.</p>
+        <p>De schaduw en de ringen werken net als in training 1: groen is aanspeelbaar, een rode stippelring staat in de schaduw. Keepers zijn vierkantjes.</p>
+        <p>Voor de kinderen: <strong>“Met z’n tweeën tegen één. Wie gaat er mee?”</strong></p>
+      </div>
+      <div class="card">
+        <h2>Voor je begint</h2>
+        <ul>
+          <li>Zet alles in één keer neer: de lange vakken én het partijveld. Daarna verplaats je niets meer.</li>
+          <li>De warming-up gaat vloeiend over in oefening B, in hetzelfde vak.</li>
+          <li>Spreek vooraf af wie er keept, en wissel de keepers elke 5 minuten.</li>
+          <li>Doe elke oefening één keer zelf voor. Kort, met een kind erbij.</li>
+          <li>Na afloop samen opruimen en vragen: “Wat heb je vandaag geleerd?”</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h2>Iemand afgemeld of te laat?</h2>
+        <ul>
+          <li>Bij A en B zijn groepjes van 4 de basis. Een vijfde kind wacht naast het vak en wisselt met wie de bal verliest.</li>
+          <li>Een groep van 3 speelt in één vak 2 tegen 1.</li>
+          <li>Komt er een kind te laat? Het sluit als vijfde aan bij een groep van 4. Je hoeft niets om te bouwen.</li>
+          <li>Bij de partijspellen wordt een extra kind wissel (in C) of joker (in D).</li>
+          <li>Speel als trainer niet vast mee. Je bent nodig om te kijken en te coachen.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="drill" class="grid" hidden>
+    <div class="stage">
+      <svg id="field" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Animatie van de oefening"></svg>
+      <div class="dots" id="dots"></div>
+      <div class="caption" aria-live="polite"><div class="n" id="capN"></div><div class="t" id="capT"></div></div>
+      <div class="controls">
+        <button id="bPrev" aria-label="Vorige stap">◀ Stap</button>
+        <button id="bPlay" class="primary">Pauze</button>
+        <button id="bNext" aria-label="Volgende stap">Stap ▶</button>
+        <span class="sp"></span>
+        <button id="bSlow" aria-pressed="false">Langzaam</button>
+        <button id="bTxt" aria-pressed="false" hidden>Tekst uit</button>
+        <button id="bFs">Volledig scherm</button>
+      </div>
+      <div class="hint">Tip: draai je telefoon voor een groter veld.</div>
+      <div class="legend">
+        <span><svg viewBox="0 0 30 14"><circle cx="15" cy="7" r="6" fill="var(--team)" stroke="#fff" stroke-width="1.5"/></svg>Blauw</span>
+        <span><svg viewBox="0 0 30 14"><circle cx="15" cy="7" r="6" fill="var(--def)" stroke="#fff" stroke-width="1.5"/></svg>Oranje</span>
+        <span><svg viewBox="0 0 30 14"><rect x="9" y="1" width="12" height="12" rx="3" fill="var(--team)" stroke="#fff" stroke-width="1.5"/></svg>Keeper</span>
+        <span><svg viewBox="0 0 30 14"><line x1="2" y1="7" x2="28" y2="7" stroke="var(--team)" stroke-width="2.4" stroke-dasharray="5 4"/></svg>Loopt</span>
+        <span><svg viewBox="0 0 30 14"><line x1="2" y1="7" x2="26" y2="7" stroke="var(--ink)" stroke-width="2.2"/><path d="M22 3 L28 7 L22 11" fill="none" stroke="var(--ink)" stroke-width="2.2"/></svg>Pass</span>
+        <span><svg viewBox="0 0 30 14"><path d="M2 7 Q6 1 10 7 T18 7 T26 7" fill="none" stroke="var(--ink)" stroke-width="2.2"/></svg>Dribbel</span>
+        <span id="lgShadow"><svg viewBox="0 0 30 14"><circle cx="9" cy="7" r="5.5" fill="none" stroke="var(--ok)" stroke-width="2.4"/><circle cx="22" cy="7" r="5.5" fill="none" stroke="var(--bad)" stroke-width="2.4" stroke-dasharray="3 2"/></svg>Vrij / in de schaduw</span>
+      </div>
+    </div>
+    <div class="info" id="info"></div>
+  </section>
+</div>
+
+<script>
+(function(){
+"use strict";
+var NS="http://www.w3.org/2000/svg";
+
+/* ---------- Oefeningen ---------- */
+var DRILLS=[
+{
+  id:"a", letter:"A", tab:"Warming-up", title:"Warming-up: passen en trappen", time:"10 minuten", min:10,
+  w:12,h:24,m:2.2,shadow:false,size:0.7,
+  cones:[[0,0],[12,0],[0,12],[12,12],[0,24],[12,24]],
+  actors:{
+    i1:{t:"team",p:[6,-1.1]}, i2:{t:"team",p:[6,25.1]},
+    m1:{t:"def",p:[6,8]}, m2:{t:"def",p:[6,16]},
+    ball:{t:"ball",p:[6,-0.3]}, ball2:{t:"ball",p:[6,24.3]}
+  },
+  steps:[
+    {d:2.8,c:"Vier kinderen per lang vak: twee vaste inspelers aan de korte kanten, elk met een bal, en twee spelers in het midden."},
+    {d:1.3,c:"Beide inspelers spelen tegelijk in.",mv:{ball:["pass",[6,7.2]],ball2:["pass",[6,16.8]]}},
+    {d:2.0,c:"Aannemen en meenemen: weg van je plek.",mv:{m1:["none",[3,12.6]],ball:["dribble",[3,13.4]],m2:["none",[9,11.4]],ball2:["dribble",[9,10.6]]}},
+    {d:1.5,c:"Speel de inspeler aan de overkant aan.",mv:{ball:["pass",[6,24.3]],ball2:["pass",[6,-0.3]]}},
+    {d:2.0,c:"Loop achter je bal aan en vraag hem opnieuw.",mv:{m1:["run",[6,17]],m2:["run",[6,7]]}},
+    {d:1.3,c:"Variatie kaatsen: de inspelers spelen weer in.",mv:{ball2:["pass",[6,6.2]],ball:["pass",[6,17.8]]}},
+    {d:1.2,c:"Kaatsend terugleggen naar de inspeler.",mv:{ball2:["pass",[6,-0.3]],ball:["pass",[6,24.3]]}},
+    {d:1.8,c:"Draai weg en vraag de bal diep.",mv:{m2:["run",[9,12.5]],m1:["run",[3,11.5]]}},
+    {d:1.4,c:"De inspeler speelt diep in.",mv:{ball2:["pass",[8.8,11.8]],ball:["pass",[3.2,12.2]]}},
+    {d:1.6,c:"Speel de overkant aan.",mv:{ball2:["pass",[6,24.3]],ball:["pass",[6,-0.3]]}},
+    {d:2.6,c:"Steeds na 2 minuten wisselen de middelste spelers met de inspelers."}
+  ],
+  goal:"Passen, aannemen en meenemen, en na je pass meteen weer aanspeelbaar zijn.",
+  setup:"Lang vak van 12 × 24 meter: hoedjes op de 4 hoeken en halverwege de lange zijden. 2 ballen per vak.",
+  coach:["Neem de bal aan en meteen mee, weg van je plek.","Na je pass: achter je bal aan en opnieuw vragen.","Steeds na 2 minuten wisselen de middelste spelers met de inspelers."],
+  o10:"Moeilijker: maximaal 2 keer raken, of een hoger tempo.",
+  ombouw:"Naar B: niets verplaatsen. De hoedjes halverwege maken van het lange vak twee vakken van 12 × 12."
+},
+{
+  id:"b", letter:"B", tab:"2 tegen 1 in twee vakken", title:"Positiespel 2 tegen 1 in twee vakken", time:"15 minuten", min:15,
+  w:12,h:24,m:1.6,shadow:true,size:0.7,
+  cones:[[0,0],[12,0],[0,12],[12,12],[0,24],[12,24]],
+  hlines:[12],
+  actors:{
+    b1:{t:"team",p:[2.5,3]}, b2:{t:"team",p:[9.5,9.5]}, o1:{t:"def",p:[5.6,6]}, o2:{t:"def",p:[6,18.5]},
+    ball:{t:"ball",p:[3.0,3.5]}
+  },
+  steps:[
+    {d:2.8,c:"Twee vakken van 12 bij 12. Blauw speelt met z’n tweeën tegen één op balbezit. Oranje wacht in het andere vak."},
+    {d:2.0,c:"De blauwe speler zonder bal loopt vrij.",mv:{b2:["run",[9.6,3.8]],o1:["run",[4.8,5]]}},
+    {d:1.2,c:"Pass. Tien passes zonder onderschepping is een punt.",mv:{ball:["pass",[9.0,3.9]],o1:["none",[6,4.8]]}},
+    {d:1.8,c:"Na je pass meteen weer vrijlopen. Oranje gaat drukken.",mv:{b1:["run",[3,9.5]],o1:["run",[7.8,4.9]]}},
+    {d:1.3,c:"Oranje onderschept de bal.",mv:{ball:["pass",[6.6,6.1]],o1:["run",[6.2,6.6]]}},
+    {d:1.4,c:"Oranje speelt meteen naar zijn teamgenoot in het andere vak.",mv:{ball:["pass",[6.1,17.8]]}},
+    {d:2.2,c:"Wie de bal verloor, gaat verdedigen in het andere vak. Oranje gaat mee.",mv:{o1:["run",[9.5,15]],b2:["run",[6.8,14.8]],o2:["none",[5.6,18.8]],ball:["none",[5.8,18.1]]}},
+    {d:1.2,c:"Nu speelt oranje 2 tegen 1. De andere blauwe speler wacht in het eerste vak.",mv:{ball:["pass",[9.0,15.5]]}},
+    {d:2.8,c:"Vrij spel, maximaal 2 keer raken. Wie de bal verliest, gaat verdedigen in het andere vak."}
+  ],
+  goal:"Met z’n tweeën tegen één de bal houden, en meteen omschakelen als je hem verovert.",
+  setup:"Hetzelfde lange vak als de warming-up, nu als twee vakken van 12 × 12. Twee kleuren hesjes.",
+  coach:["Tien passes zonder onderschepping is een punt.","Wie de bal verovert, speelt meteen naar zijn teamgenoot in het andere vak.","Maximaal 2 keer raken. Lukt dat niet, laat dan vrij spelen."],
+  o10:"Moeilijker: 1 keer raken, of kleinere vakken van 10 × 10.",
+  ombouw:"Naar C: niets verplaatsen. Het partijveld heb je vooraf al neergezet."
+},
+{
+  id:"c", letter:"C", tab:"Partijspel met keepers", title:"Partijspel: 2 tegen 1 in de opbouw, 2 tegen 1 in de aanval", time:"20 minuten", min:20,
+  w:24,h:34,m:2.6,shadow:true,size:0.9,
+  cones:[[0,0],[24,0],[0,17],[24,17],[0,34],[24,34]],
+  hlines:[17], goals:[[12,0,"t",4],[12,34,"b",4]],
+  labels:[{x:0.7,y:16.1,t:"opbouwvak blauw",ry:16.4,ra:"end"},{x:0.7,y:18.6,t:"aanvalsvak blauw",ry:17.6,ra:"start"}],
+  actors:{
+    bk:{t:"teamK",p:[12,1.0]}, b1:{t:"team",p:[6,6]}, b2:{t:"team",p:[18,6]}, b3:{t:"team",p:[12,21]},
+    o10:{t:"def",p:[12,9]}, o4:{t:"def",p:[12,25.5]}, o3:{t:"def",p:[17.5,35.6]}, ok:{t:"defK",p:[12,33]},
+    ball:{t:"ball",p:[12,1.9]}
+  },
+  steps:[
+    {d:3.2,c:"Twee helften: opbouwvak en aanvalsvak. Blauw bouwt op vanaf de eigen keeper, met 2 tegen 1. Voorin staat de spits tegen één verdediger. Naast het doel staat een rustspeler."},
+    {d:1.4,c:"De keeper speelt in.",mv:{ball:["pass",[6.4,6.6]],o10:["run",[9.6,8.4]]}},
+    {d:1.8,c:"De andere verdediger loopt vrij.",mv:{b2:["run",[19,10]],o10:["run",[7.6,9.4]]}},
+    {d:1.4,c:"Pass naar de vrije speler.",mv:{ball:["pass",[18.5,10.4]],o10:["run",[13,11]]}},
+    {d:1.8,c:"De spits vraagt de bal.",mv:{b3:["run",[15.5,19.5]],o4:["run",[14.4,22.6]]}},
+    {d:1.3,c:"Inspelen op de spits.",mv:{ball:["pass",[15.8,18.8]]}},
+    {d:1.6,c:"De spits kaatst terug op de speler die meegaat.",mv:{b2:["run",[18.6,16.2]],ball:["pass",[18.4,16.9]]}},
+    {d:2.0,c:"Hij dribbelt het aanvalsvak in. Nu is het 2 tegen 1.",mv:{b2:["none",[17.8,23.4]],ball:["dribble",[17.6,24.3]],b3:["run",[9.8,26]],o4:["run",[16.0,26.4]]}},
+    {d:1.3,c:"Pass op de vrije spits.",mv:{ball:["pass",[10.6,26.3]],o4:["run",[13.5,27.6]]}},
+    {d:1.2,c:"Afronden.",mv:{ball:["pass",[13.4,34.6]],ok:["run",[10.8,33]]}},
+    {d:3.4,c:"Eerst 5 keer van één kant, dan de andere ploeg. Daarna van twee kanten: de rustspeler naast het doel komt erbij."}
+  ],
+  goal:"Van achteruit opbouwen met 2 tegen 1, en in het aanvalsvak opnieuw 2 tegen 1 maken.",
+  setup:"Partijveld met een middenlijn: de helft bij je eigen doel is het opbouwvak, de andere helft het aanvalsvak. Aan beide kanten een doel met keeper. De rustspeler staat naast het doel van de verdedigende ploeg en wisselt steeds met de verdediger voorin.",
+  coach:["Het aanvalsvak in dribbelen mag pas als iedereen in het opbouwvak de bal heeft geraakt.","Of: pass op de spits, die kaatst op een speler die meegaat. Zo maak je 2 tegen 1.","Geen hoekschoppen: gaat de bal achter, dan begint de eigen keeper opnieuw."],
+  o10:"Moeilijker: de rustspeler komt het veld in, zodat het 2 tegen 2 wordt in het aanvalsvak. Makkelijker: een groter veld.",
+  ombouw:"Naar D: niets verplaatsen. Hetzelfde veld, de middenlijn blijft liggen. Alleen de regels van de vakken vervallen."
+},
+{
+  id:"d", letter:"D", tab:"Partijspel 3 tegen 3", title:"Partijspel 3 tegen 3 met keepers", time:"15 minuten", min:15,
+  w:24,h:34,m:2.0,shadow:true,size:0.9,
+  cones:[[0,0],[24,0],[0,17],[24,17],[0,34],[24,34]],
+  hlines:[17], goals:[[12,0,"t",4],[12,34,"b",4]],
+  actors:{
+    bk:{t:"teamK",p:[12,1.0]}, b1:{t:"team",p:[6,8]}, b2:{t:"team",p:[18,8]}, b3:{t:"team",p:[12,21]},
+    o1:{t:"def",p:[6,26]}, o2:{t:"def",p:[18,26]}, o3:{t:"def",p:[12,13]}, ok:{t:"defK",p:[12,33]},
+    ball:{t:"ball",p:[12,1.9]}
+  },
+  steps:[
+    {d:3.0,c:"Partijspel 3 tegen 3 met keepers. Eerst staat iedereen op zijn plek: twee achter, één voor. Dan pas starten."},
+    {d:1.4,c:"Opbouwen vanaf de keeper.",mv:{ball:["pass",[6.4,8.6]],o3:["run",[8.2,10.6]]}},
+    {d:1.8,c:"De spits zoekt een plek waar hij de bal kan krijgen. Er moet altijd iemand diep staan.",mv:{b3:["run",[5.5,20]],o1:["run",[6.6,23.6]],b2:["run",[19,12]]}},
+    {d:1.5,c:"Kan het diep? Speel de spits aan.",mv:{ball:["pass",[5.7,19.3]],o3:["run",[7,12.5]]}},
+    {d:1.6,c:"De spits kaatst terug op een speler die meegaat.",mv:{b1:["run",[8.4,15.8]],ball:["pass",[8.6,16.4]]}},
+    {d:2.0,c:"Met de bal de andere helft in: nu is het 2 tegen 1.",mv:{b1:["none",[11,23]],ball:["dribble",[11.3,23.8]],b3:["run",[4.5,27]],o1:["run",[10.6,26.6]],o2:["run",[16,27]]}},
+    {d:1.3,c:"Pass op de vrije speler.",mv:{ball:["pass",[5.1,27.2]],o1:["run",[8,27.5]]}},
+    {d:1.2,c:"Afronden.",mv:{ball:["pass",[10.6,34.6]],ok:["run",[13,33]]}},
+    {d:3.2,c:"Niet iedereen een eigen tegenstander: blijf in je formatie. Coach steeds: is er iemand diep?"}
+  ],
+  goal:"Alles samen in een wedstrijd, met de formatie als houvast.",
+  setup:"Hetzelfde veld als oefening C, zonder de regels van de vakken. De middenlijn blijft liggen als houvast.",
+  coach:["Eerst iedereen op zijn plek, dan pas starten.","Niet iedereen een eigen tegenstander: blijf in je formatie.","Coach steeds: “Is er iemand diep?”"],
+  o10:"Dit lukt niet in één training. Herhaal deze training een paar weken achter elkaar."
+}
+];
+
+/* ---------- Helpers ---------- */
+function el(tag,attrs,parent){var e=document.createElementNS(NS,tag);for(var k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e}
+function clone(o){var r={};for(var k in o)r[k]=[o[k][0],o[k][1]];return r}
+function ease(t){return t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2}
+function easeOut(t){return 1-Math.pow(1-t,3)}
+function lerp(a,b,t){return[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t]}
+
+var svg=document.getElementById("field");
+var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+var D=null, pos={}, from={}, stepIdx=0, stepT=0, playing=!reduce, speed=1, lastTs=null;
+var nodes={}, gShadow, gTrails, gActors, curTrails=[], LAYER=null, holder="b", lastRot=null;
+function wantRot(dr){return dr.h>dr.w*1.15 && window.innerWidth>window.innerHeight}
+
+function initialPos(dr){var r={};for(var k in dr.actors)r[k]=dr.actors[k].p.slice();return r}
+function posAtStep(dr,idx){
+  var p=initialPos(dr);
+  for(var i=0;i<idx;i++){var mv=dr.steps[i].mv||{};for(var k in mv)p[k]=mv[k][1].slice()}
+  return p;
+}
+
+/* ---------- Scene ---------- */
+function build(dr){
+  while(svg.firstChild)svg.removeChild(svg.firstChild);
+  var m=dr.m, s=dr.size;
+  svg.setAttribute("viewBox",(-m)+" "+(-m)+" "+(dr.w+2*m)+" "+(dr.h+2*m));
+  var defs=el("defs",{},svg);
+  var mk=el("marker",{id:"arr",viewBox:"0 0 10 10",refX:"7",refY:"5",markerWidth:"4",markerHeight:"4",orient:"auto-start-reverse"},defs);
+  el("path",{d:"M0 0 L10 5 L0 10 z",fill:"#fff"},mk);
+  var cp=el("clipPath",{id:"clipF"},defs); el("rect",{x:-m,y:-m,width:dr.w+2*m,height:dr.h+2*m},cp);
+  var rot=wantRot(dr); lastRot=rot;
+  LAYER=el("g",rot?{transform:"rotate(-90)"}:{},svg);
+  if(rot)svg.setAttribute("viewBox",(-m)+" "+(-(dr.w+m))+" "+(dr.h+2*m)+" "+(dr.w+2*m));
+  holder="b";
+  // gras
+  el("rect",{x:-m,y:-m,width:dr.w+2*m,height:dr.h+2*m,fill:"#3E8A55"},LAYER);
+  var stripes=8, sw=(dr.w+2*m)/stripes;
+  for(var i=0;i<stripes;i+=2)el("rect",{x:-m+i*sw,y:-m,width:sw,height:dr.h+2*m,fill:"#438F5A"},LAYER);
+  el("rect",{x:0,y:0,width:dr.w,height:dr.h,fill:"none",stroke:"rgba(255,255,255,.85)","stroke-width":0.08*s/0.55},LAYER);
+  if(dr.midline)el("line",{x1:dr.w/2,y1:0,x2:dr.w/2,y2:dr.h,stroke:"rgba(255,255,255,.6)","stroke-width":0.07},LAYER);
+  if(dr.yline){
+    var y=dr.yline;
+    el("line",{x1:y[0][0],y1:y[0][1],x2:y[1][0],y2:y[1][1],stroke:"#F5D020","stroke-width":0.14,"stroke-dasharray":"0.5 0.35"},LAYER);
+    for(var x=0;x<=dr.w;x+=dr.w/2)cone(x,y[0][1],"#F5D020",s*0.55);
+  }
+  (dr.hlines||[]).forEach(function(y){
+    el("line",{x1:0,y1:y,x2:dr.w,y2:y,stroke:"rgba(255,255,255,.75)","stroke-width":0.08*s/0.55,"stroke-dasharray":(0.45*s/0.55)+" "+(0.35*s/0.55)},LAYER);
+  });
+  (dr.goals||[]).forEach(function(g){
+    var x=g[0], y=g[1], sd=g[2], gw=g[3]||2.4, dp=0.9*s/0.55, r;
+    if(sd==="t")r={x:x-gw/2,y:y-dp,width:gw,height:dp}; else if(sd==="b")r={x:x-gw/2,y:y,width:gw,height:dp};
+    else if(sd==="l")r={x:x-dp,y:y-gw/2,width:dp,height:gw}; else r={x:x,y:y-gw/2,width:dp,height:gw};
+    r.fill="rgba(255,255,255,.18)"; r.stroke="#fff"; r["stroke-width"]=0.12*s/0.55;
+    el("rect",r,LAYER);
+  });
+  gShadow=el("g",{"clip-path":"url(#clipF)"},LAYER);
+  (dr.cones||[]).forEach(function(c){cone(c[0],c[1],"#FF7A1A",s*0.6)});
+  (dr.gates||[]).forEach(function(g){
+    el("line",{x1:g[0][0],y1:g[0][1],x2:g[1][0],y2:g[1][1],stroke:"rgba(255,255,255,.5)","stroke-width":0.06,"stroke-dasharray":"0.2 0.2"},LAYER);
+    pion(g[0][0],g[0][1],s); pion(g[1][0],g[1][1],s);
+  });
+  (dr.labels||[]).forEach(function(l){
+    var ly=(rot&&l.ry!=null)?l.ry:l.y;
+    var ta={x:l.x,y:ly,"text-anchor":(rot&&l.ra)?l.ra:(l.a||"start"),"font-size":0.55*s/0.55,fill:"#FFF6C2","font-family":"Atkinson Hyperlegible, system-ui, sans-serif"};
+    if(rot)ta.transform="rotate(90 "+l.x+" "+ly+")";
+    var t=el("text",ta,LAYER);
+    t.textContent=l.t;
+  });
+  gTrails=el("g",{},LAYER);
+  gActors=el("g",{},LAYER);
+  nodes={};
+  for(var k in dr.actors){
+    var a=dr.actors[k], g=el("g",{},gActors), n={g:g,t:a.t};
+    if(a.t==="ball"){
+      el("circle",{r:s*0.42,fill:"#fff",stroke:"#1b1b1b","stroke-width":s*0.08},g);
+      el("circle",{r:s*0.14,fill:"#1b1b1b"},g);
+    }else{
+      var blue=a.t==="team"||a.t==="teamK", gk=a.t==="teamK"||a.t==="defK", col=blue?"var(--team)":"var(--def)";
+      n.side=blue?"b":"o"; n.gk=gk;
+      if(gk)el("rect",{x:-s,y:-s,width:2*s,height:2*s,rx:s*0.35,fill:col,stroke:"#fff","stroke-width":s*0.18},g);
+      else{n.ring=el("circle",{r:s*1.45,fill:"none","stroke-width":s*0.2,opacity:0},g);el("circle",{r:s,fill:col,stroke:"#fff","stroke-width":s*0.18},g)}
+    }
+    nodes[k]=n;
+  }
+  // bal bovenop
+  for(var kb in nodes)if(nodes[kb].t==="ball")gActors.appendChild(nodes[kb].g);
+}
+function cone(x,y,col,s){var h=s*0.9;el("path",{d:"M"+(x-h*0.6)+" "+(y+h*0.45)+" L"+x+" "+(y-h*0.55)+" L"+(x+h*0.6)+" "+(y+h*0.45)+" Z",fill:col,stroke:"rgba(0,0,0,.25)","stroke-width":0.04},LAYER)}
+function pion(x,y,s){el("circle",{cx:x,cy:y,r:s*0.42,fill:"#FF7A1A",stroke:"#fff","stroke-width":s*0.12},LAYER);el("circle",{cx:x,cy:y,r:s*0.14,fill:"#fff"},LAYER)}
+
+/* ---------- Trails ---------- */
+function wavyPts(a,b,u){
+  var dx=b[0]-a[0], dy=b[1]-a[1], L=Math.hypot(dx,dy)||1, nx=-dy/L, ny=dx/L;
+  var k=Math.max(2,Math.round(L/1.1)), n=Math.max(8,Math.round(L*12)), pts=[];
+  for(var i=0;i<=n;i++){var v=i/n*u, amp=0.2*(D.size/0.55)*Math.sin(v*k*2*Math.PI)*Math.min(1,v*L/0.6);
+    pts.push((a[0]+dx*v+nx*amp).toFixed(3)+" "+(a[1]+dy*v+ny*amp).toFixed(3))}
+  return "M"+pts.join(" L");
+}
+function makeTrails(){
+  // vorige sporen vervagen
+  Array.prototype.forEach.call(gTrails.childNodes,function(p){p.setAttribute("opacity","0.28")});
+  curTrails=[];
+  var mv=D.steps[stepIdx].mv||{};
+  for(var k in mv){
+    var kind=mv[k][0]; if(kind==="none")continue;
+    var tt=D.actors[k].t, isTeam=tt==="team"||tt==="teamK", col=kind==="run"?(isTeam?"#9DBBFF":"#FFC48A"):"#fff", sc=D.size/0.55;
+    var attrs={fill:"none",stroke:col,"stroke-width":0.13*sc,"stroke-linecap":"round"};
+    if(kind==="run")attrs["stroke-dasharray"]=(0.35*sc)+" "+(0.3*sc);
+    if(kind==="pass")attrs["marker-end"]="url(#arr)";
+    curTrails.push({k:k,kind:kind,a:from[k].slice(),b:mv[k][1].slice(),p:el("path",attrs,gTrails)});
+  }
+}
+function drawTrails(e){
+  curTrails.forEach(function(t){
+    if(t.kind==="dribble")t.p.setAttribute("d",wavyPts(t.a,t.b,e));
+    else{var q=lerp(t.a,t.b,e);t.p.setAttribute("d","M"+t.a[0]+" "+t.a[1]+" L"+q[0]+" "+q[1])}
+    t.p.style.display=e<0.02?"none":"";
+  });
+}
+
+/* ---------- Schaduw ---------- */
+function shadowOf(B,Dp,r){
+  var dx=Dp[0]-B[0], dy=Dp[1]-B[1], d=Math.hypot(dx,dy);
+  if(d<=r+0.05)return null;
+  var ang=Math.atan2(dy,dx), half=Math.asin(r/d), L=60;
+  return {ang:ang,half:half,d:d,
+    poly:[[Dp[0]-Math.sin(ang)*r*0.0+Math.cos(ang+Math.PI/2)*r,Dp[1]+Math.sin(ang+Math.PI/2)*r],
+          [B[0]+Math.cos(ang+half)*L,B[1]+Math.sin(ang+half)*L],
+          [B[0]+Math.cos(ang-half)*L,B[1]+Math.sin(ang-half)*L],
+          [Dp[0]+Math.cos(ang-Math.PI/2)*r,Dp[1]+Math.sin(ang-Math.PI/2)*r]]};
+}
+function render(){
+  for(var k in nodes){var p=pos[k];nodes[k].g.setAttribute("transform","translate("+p[0].toFixed(3)+" "+p[1].toFixed(3)+")")}
+  while(gShadow.firstChild)gShadow.removeChild(gShadow.firstChild);
+  if(!D.shadow){for(var k2 in nodes)if(nodes[k2].ring)nodes[k2].ring.setAttribute("opacity",0);return}
+  var B=pos.ball, R=D.size*1.6, sh=[], best=null, bd=1e9;
+  for(var kh in nodes){var nh=nodes[kh]; if(nh.t==="ball")continue;
+    var dh=Math.hypot(pos[kh][0]-B[0],pos[kh][1]-B[1]); if(dh<bd){bd=dh;best=nh}}
+  if(best&&bd<D.size*2.6)holder=best.side;
+  for(var k3 in nodes){var n3=nodes[k3]; if(n3.t==="ball"||n3.gk||n3.side===holder)continue;
+    var s=shadowOf(B,pos[k3],R); if(!s)continue; sh.push(s);
+    el("polygon",{points:s.poly.map(function(q){return q[0].toFixed(3)+","+q[1].toFixed(3)}).join(" "),fill:"rgba(10,30,18,.33)"},gShadow);
+  }
+  for(var k4 in nodes){var n=nodes[k4]; if(!n.ring)continue;
+    var P=pos[k4], dB=Math.hypot(P[0]-B[0],P[1]-B[1]);
+    if(dB<D.size*2.2||n.side!==holder){n.ring.setAttribute("opacity",0);continue}
+    var inS=sh.some(function(s){
+      var a=Math.atan2(P[1]-B[1],P[0]-B[0]), diff=Math.abs(((a-s.ang+3*Math.PI)%(2*Math.PI))-Math.PI);
+      return diff<s.half && dB>s.d;
+    });
+    n.ring.setAttribute("opacity",1);
+    n.ring.setAttribute("stroke",inS?"#FF5A5F":"#3BE07A");
+    n.ring.setAttribute("stroke-dasharray",inS?(D.size*0.5)+" "+(D.size*0.35):"none");
+  }
+}
+
+/* ---------- Afspelen ---------- */
+function setCaption(){
+  document.getElementById("capN").textContent="Stap "+(stepIdx+1)+" van "+D.steps.length;
+  document.getElementById("capT").textContent=D.steps[stepIdx].c;
+  var dots=document.getElementById("dots").children;
+  for(var i=0;i<dots.length;i++)dots[i].className=i<=stepIdx?"on":"";
+}
+function goStep(i,clearAll){
+  stepIdx=(i+D.steps.length)%D.steps.length;
+  pos=posAtStep(D,stepIdx); from=clone(pos); stepT=0;
+  if(clearAll||stepIdx===0)while(gTrails.firstChild)gTrails.removeChild(gTrails.firstChild);
+  makeTrails(); setCaption(); render();
+}
+function tick(ts){
+  if(lastTs===null)lastTs=ts;
+  var dt=Math.min(0.1,(ts-lastTs)/1000); lastTs=ts;
+  if(D&&playing){
+    var st=D.steps[stepIdx]; stepT+=dt*speed;
+    var t=Math.min(1,stepT/st.d), mv=st.mv||{};
+    for(var k in mv){var kind=mv[k][0], e=kind==="pass"?easeOut(t):ease(t);pos[k]=lerp(from[k],mv[k][1],e)}
+    var eT=ease(t); curTrails.forEach(function(tr){tr.e=tr.kind==="pass"?easeOut(t):eT});
+    curTrails.forEach(function(tr){
+      if(tr.kind==="dribble")tr.p.setAttribute("d",wavyPts(tr.a,tr.b,tr.e));
+      else{var q=lerp(tr.a,tr.b,tr.e);tr.p.setAttribute("d","M"+tr.a[0]+" "+tr.a[1]+" L"+q[0]+" "+q[1])}
+    });
+    render();
+    if(stepT>=st.d+0.35)goStep(stepIdx+1,false);
+  }
+  requestAnimationFrame(tick);
+}
+function showFinal(){ // stap direct in eindstand tonen (bij handmatig stappen)
+  var mv=D.steps[stepIdx].mv||{}; for(var k in mv)pos[k]=mv[k][1].slice();
+  drawTrails(1); stepT=D.steps[stepIdx].d; render();
+}
+
+/* ---------- Aantal kinderen ---------- */
+var KIDS=[6,7,8,9,10], N=9;
+try{var sv=parseInt(localStorage.getItem("ckc-kinderen"),10);if(KIDS.indexOf(sv)>=0)N=sv}catch(e){}
+function plan(n){return {groepen:{6:[3,3],7:[4,3],8:[4,4],9:[5,4],10:[5,5]}[n]}}
+function lijst(a){return a.length<2?String(a[0]):a.slice(0,-1).join(", ")+" en "+a[a.length-1]}
+function heeft(p,x){return p.groepen.indexOf(x)>=0}
+function vakTekst(p){return "<strong>"+p.groepen.length+" lange vakken</strong> met "+lijst(p.groepen)+" kinderen."}
+var INDELING={
+  a:function(n,p){return vakTekst(p)+(heeft(p,4)?" Groep van 4: 2 inspelers en 2 in het midden, 2 ballen.":"")+
+    (heeft(p,3)?" Groep van 3: 2 inspelers en 1 in het midden, 1 bal.":"")+
+    (heeft(p,5)?" Groep van 5: aan één kant staan 2 inspelers, die om de beurt inspelen.":"")},
+  b:function(n,p){return vakTekst(p)+(heeft(p,4)?" Groep van 4: 2 tegen 1, de vierde wacht in het andere vak.":"")+
+    (heeft(p,3)?" Groep van 3: in één vak 2 tegen 1. Wie de bal verliest, wordt verdediger.":"")+
+    (heeft(p,5)?" Groep van 5: de vijfde wacht naast het vak en wisselt met wie de bal verliest.":"")},
+  c:function(n){return {
+    6:"<strong>2 keepers en 2 tegen 2.</strong> Oranje heeft één verdediger per helft, dus blauw speelt in beide helften 2 tegen 1. Geen rustspeler.",
+    7:"<strong>2 keepers, 3 blauw en 2 oranje.</strong> Oranje heeft één verdediger per helft en geen rustspeler.",
+    8:"<strong>2 keepers en 3 tegen 3.</strong> De vorm uit het handboek, met een rustspeler naast het doel.",
+    9:"<strong>2 keepers, 3 tegen 3 en 1 wissel.</strong> De wissel komt erin na elke aanval.",
+    10:"<strong>2 keepers, 3 tegen 3 en 2 wissels,</strong> één per ploeg. Wisselen na elke aanval."
+  }[n]+" Keepers wisselen elke 5 minuten."},
+  d:function(n){return {
+    6:"<strong>2 tegen 2 met keepers.</strong> Eén achter, één voor.",
+    7:"<strong>2 tegen 2 met keepers en een joker.</strong> De joker speelt mee met de ploeg die de bal heeft. Wissel de joker elke 3 minuten.",
+    8:"<strong>3 tegen 3 met keepers.</strong> Twee achter, één voor.",
+    9:"<strong>3 tegen 3 met keepers en een joker.</strong> Wissel de joker elke 3 minuten.",
+    10:"<strong>4 tegen 4 met keepers,</strong> in een ruit: één achter, twee opzij, één voor."
+  }[n]}
+};
+function adv(x){return x+Math.max(2,Math.ceil(x*0.25))}
+function materiaal(n){
+  var p=plan(n), g=p.groepen.length, vak=3*(g+1), veld=6, hes=Math.ceil(n/2), r=[
+    ["Oranje hoedjes","lange vakken ("+vak+") en partijveld ("+veld+")",vak+veld,adv(vak+veld)],
+    ["Doelen","pupillendoelen, of 2 pionnen per doel",2,2],
+    ["Ballen","2 per vak, plus reserve bij de doelen",2*g+2,Math.max(n,8)],
+    ["Hesjes in 2 kleuren","aantal per kleur",hes,hes+2]
+  ];
+  if(n===7||n===9)r.push(["Hesje, derde kleur","voor de joker in D",1,2]);
+  r.push(["Keepershandschoenen","als de club ze heeft","–",2]);
+  return r;
+}
+function renderOverview(){
+  var p=plan(N);
+  document.getElementById("matBox").innerHTML=
+    '<table class="mat"><thead><tr><th>Bij '+N+' kinderen</th><th class="num">Minimaal</th><th class="num">Advies</th></tr></thead><tbody>'+
+    materiaal(N).map(function(m){return '<tr><td>'+m[0]+'<small>'+m[1]+'</small></td><td class="num">'+m[2]+'</td><td class="num">'+m[3]+'</td></tr>'}).join("")+
+    '</tbody></table><p class="note">Gerekend per opstelling: je zet alles vooraf neer en verplaatst tussen de oefeningen niets. Advies is ruimer gerekend, zodat je een kapotte pion of lekke bal meteen kunt vervangen. Neem ook een balpomp mee.</p>';
+  document.getElementById("indTitle").textContent="Indeling bij "+N+" kinderen";
+  document.getElementById("indBox").innerHTML=
+    '<p>Zet <strong>'+p.groepen.length+' lange vakken van 12 × 24 meter</strong> tegen elkaar aan, met ook een hoedje halverwege elke lange zijde. Zet daarnaast <strong>één partijveld van ongeveer 24 × 34 meter</strong> met een middenlijn en aan beide kanten een doel.</p>'+
+    DRILLS.map(function(d){return '<div class="block"><h3>'+d.letter+'. '+d.tab+'</h3><p>'+INDELING[d.id](N,p)+'</p>'+
+      (d.ombouw?'<p class="note">'+d.ombouw+'</p>':'')+'</div>'}).join("");
+}
+function renderInfo(){
+  if(!D)return;
+  document.getElementById("info").innerHTML='<h2>'+D.letter+'. '+D.title+'</h2><p class="time">'+D.time+'</p>'+
+    '<p class="goal">'+D.goal+'</p>'+
+    '<div class="block"><h3>Neerzetten</h3><p>'+D.setup+'</p></div>'+
+    '<div class="block"><h3>Met '+N+' kinderen</h3><p>'+INDELING[D.id](N,plan(N))+'</p></div>'+
+    '<div class="block"><h3>Coachen</h3><ul>'+D.coach.map(function(c){return"<li>"+c+"</li>"}).join("")+'</ul></div>'+
+    '<div class="block"><h3>Voor O10</h3><p>'+D.o10+'</p></div>'+
+    (D.ombouw?'<div class="block"><h3>Ombouwen</h3><p>'+D.ombouw+'</p></div>':'');
+}
+var kidsEl=document.getElementById("kids");
+KIDS.forEach(function(k){
+  var b=document.createElement("button");b.type="button";b.textContent=k;b.setAttribute("aria-label",k+" kinderen");
+  b.addEventListener("click",function(){setN(k)});kidsEl.appendChild(b);
+});
+function setN(k){
+  N=k; try{localStorage.setItem("ckc-kinderen",String(k))}catch(e){}
+  Array.prototype.forEach.call(kidsEl.children,function(b){b.setAttribute("aria-pressed",b.textContent===String(k)?"true":"false")});
+  renderOverview(); renderInfo();
+}
+setN(N);
+
+/* ---------- UI ---------- */
+var tabs=document.getElementById("tabs"), ov=document.getElementById("ov"), dr=document.getElementById("drill");
+var views=[{id:"overzicht",letter:"",tab:"Overzicht"}].concat(DRILLS);
+views.forEach(function(v,i){
+  var b=document.createElement("button"); b.setAttribute("role","tab");
+  b.innerHTML=(v.letter?'<span class="l">'+v.letter+'</span>':'')+v.tab;
+  b.addEventListener("click",function(){select(i)}); tabs.appendChild(b);
+});
+var tl=document.getElementById("timeline");
+DRILLS.forEach(function(d,i){
+  var b=document.createElement("button");
+  b.style.flex=String(d.min||1);
+  b.innerHTML="<b>"+d.letter+" "+d.tab+"</b><small>"+d.time+"</small>";
+  b.addEventListener("click",function(){select(i+1)}); tl.appendChild(b);
+});
+function select(i){
+  Array.prototype.forEach.call(tabs.children,function(b,j){b.setAttribute("aria-selected",j===i?"true":"false")});
+  if(i===0){ov.hidden=false;dr.hidden=true;D=null;if(location.hash){try{history.replaceState(null,"",location.href.split("#")[0])}catch(e){}}return}
+  ov.hidden=true;dr.hidden=false;D=DRILLS[i-1];
+  build(D);
+  var dots=document.getElementById("dots"); dots.innerHTML="";
+  D.steps.forEach(function(){dots.appendChild(document.createElement("i"))});
+  document.getElementById("lgShadow").style.display=D.shadow?"":"none";
+  document.querySelector(".stage").classList.toggle("wide",D.w/D.h>1.3);
+  renderInfo();
+  goStep(0,true);
+  if(!playing)showFinal();
+  location.hash=D.id;
+}
+document.getElementById("bPlay").addEventListener("click",function(){
+  playing=!playing; this.textContent=playing?"Pauze":"Afspelen";
+  if(playing&&stepT>=D.steps[stepIdx].d)goStep(stepIdx+1,false);
+});
+document.getElementById("bNext").addEventListener("click",function(){goStep(stepIdx+1,false);if(!playing)showFinal()});
+document.getElementById("bPrev").addEventListener("click",function(){goStep(stepIdx-1,true);if(!playing)showFinal()});
+document.getElementById("bSlow").addEventListener("click",function(){
+  speed=speed===1?0.5:1; this.setAttribute("aria-pressed",speed!==1);this.textContent=speed===1?"Langzaam":"Normaal tempo";
+});
+document.getElementById("bPlay").textContent=playing?"Pauze":"Afspelen";
+var stage=document.querySelector(".stage"), bFs=document.getElementById("bFs"), bTxt=document.getElementById("bTxt"), wl=null;
+function setFs(on){
+  stage.classList.toggle("fs",on); document.body.classList.toggle("fsopen",on);
+  bFs.textContent=on?"Sluiten":"Volledig scherm"; bTxt.hidden=!on;
+  if(on){
+    var r=document.documentElement;
+    try{if(r.requestFullscreen&&!document.fullscreenElement)r.requestFullscreen().catch(function(){})}catch(e){}
+    try{if(navigator.wakeLock)navigator.wakeLock.request("screen").then(function(w){wl=w}).catch(function(){})}catch(e){}
+  }else{
+    try{if(document.fullscreenElement&&document.exitFullscreen)document.exitFullscreen().catch(function(){})}catch(e){}
+    if(wl){wl.release().catch(function(){});wl=null}
+    stage.classList.remove("notext"); bTxt.textContent="Tekst uit"; bTxt.setAttribute("aria-pressed","false");
+  }
+}
+bFs.addEventListener("click",function(){setFs(!stage.classList.contains("fs"))});
+bTxt.addEventListener("click",function(){var off=stage.classList.toggle("notext");this.textContent=off?"Tekst aan":"Tekst uit";this.setAttribute("aria-pressed",off)});
+svg.addEventListener("click",function(){document.getElementById("bPlay").click()});
+document.addEventListener("keydown",function(e){if(e.key==="Escape"&&stage.classList.contains("fs"))setFs(false)});
+document.addEventListener("fullscreenchange",function(){if(!document.fullscreenElement&&stage.classList.contains("fs"))setFs(false)});
+
+var start=0, h=(location.hash||"").replace("#","");
+DRILLS.forEach(function(d,i){if(d.id===h)start=i+1});
+select(start);
+window.addEventListener("hashchange",function(){var h2=location.hash.replace("#","");DRILLS.forEach(function(d,i){if(d.id===h2&&D!==d)select(i+1)});if(!h2&&D)select(0)});
+window.addEventListener("resize",function(){
+  if(!D||wantRot(D)===lastRot)return;
+  var keep=stepIdx; build(D); goStep(keep,true); if(!playing)showFinal();
+});
+requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>
